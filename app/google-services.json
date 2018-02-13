@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "67743122690",
+    "firebase_url": "https://hometribe-a0e85.firebaseio.com",
+    "project_id": "hometribe-a0e85",
+    "storage_bucket": "hometribe-a0e85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67743122690:android:d3ec540747987887",
+        "android_client_info": {
+          "package_name": "com.necohorne.hometribe"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "67743122690-r69mro97ats0gug3670j4u7mk7l62l2p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.necohorne.hometribe",
+            "certificate_hash": "c84d1faf32526b47cbcdf1e5205ebd9449f22191"
+          }
+        },
+        {
+          "client_id": "67743122690-6saahpb265a92vlioup9aor2nde1s84d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDsGN2QKeO1KnVCRCokcQs0yKV0YZCHKk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "67743122690-6saahpb265a92vlioup9aor2nde1s84d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
