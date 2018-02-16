@@ -8,38 +8,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 public abstract class Crimes {
 
-    /**
-     * Types of Crimes include:
-     *
-     * Murder
-     * Attempted Murder
-     * Rape
-     * Kidnapping
-     * Assault
-     * Sexual Assault
-     *
-     * House Burglary
-     * House Robbery
-     * Commercial Burglary
-     * Commercial Robbery
-     * Robbery with aggravating circumstances
-     * Shoplifting
-     * Pick-pocketing or bag-snatching
-     *
-     * Hi-jacking
-     * Theft of a Motor Vehicle
-     * Theft from a Motor Vehicle
-     *
-     * Damage to property / Arson
-     *
-     * Stock-theft
-     * Farm Murder
-     * Farm attack
-     *
-     * other...
-     *
-     */
-
     private String incidentType;
     private String incidentDate;
     private String incidentTime;

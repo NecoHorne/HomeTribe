@@ -90,4 +90,7 @@
     <string name="user_name">User Name</string>
     <string name="chat">Chat</string>
     <string name="add_incident">Add Incident</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="resend_verification_email">Resend Verification Email</string>
 </resources>

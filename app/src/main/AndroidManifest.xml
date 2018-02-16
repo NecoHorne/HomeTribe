@@ -12,7 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Activities.LoginActivity">
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:theme="@style/Theme.AppTheme.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -55,6 +57,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.necohorne.hometribe.Activities.MainActivity" />
         </activity>
+        <activity
+            android:name=".Activities.RegisterNewAccount"
+            android:theme="@style/Theme.AppTheme.Light.NoActionBar" />
+        <activity android:name=".Activities.ResendVerificationDialog" />
+        <activity android:name=".Activities.AddIncidentDialog"></activity>
     </application>
 
 </manifest>

@@ -10,5 +10,4 @@ public class Constants {
     public static final String FBPERMISSIONS = "public_profile";
     public static final String FACEBOOKLOGSTATUS = "FacebookLogin";
 
-
 }

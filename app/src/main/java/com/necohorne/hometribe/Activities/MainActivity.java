@@ -3,8 +3,6 @@ package com.necohorne.hometribe.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,7 +14,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -29,16 +26,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 import com.facebook.Profile;
-import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.widget.ProfilePictureView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -48,26 +40,25 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.necohorne.hometribe.R;
-import com.squareup.picasso.Picasso;
 
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+
+    private static final String TAG = "MainActivity";
 
     //location objects
     private GoogleMap mMap;
@@ -110,6 +101,9 @@ public class MainActivity extends AppCompatActivity
         fbProfile = Profile.getCurrentProfile();
     }
 
+    private Intent mLogOutIntent;
+
+    //Activity Lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState );
@@ -120,7 +114,7 @@ public class MainActivity extends AppCompatActivity
 
         //login
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        updateProfilePicture();
+        updateUserProfile();
 
         //options Menu Setup
         settingsPrefsSetUp();
@@ -151,13 +145,26 @@ public class MainActivity extends AppCompatActivity
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapView);
         mapFragment.getMapAsync( MainActivity.this );
 
+        mLogOutIntent = new Intent(MainActivity.this, LoginActivity.class);
+
 
     }
 
     @Override
     protected void onResume() {
-
+        updateUserProfile();
+        checkAuthenticationState();
         super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -212,6 +219,15 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_chat:
                 //
                 break;
+            case R.id.nav_friends:
+                //
+                break;
+            case R.id.nav_share:
+                //
+                break;
+            case R.id.nav_send:
+                //
+                break;
             //add more nav menu items
         }
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
@@ -219,10 +235,20 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    // Social Media
+    //Login and user code
     private void logOut() {
         facebookLogOut();
         googleLogOut();
+        firebaseLogOut();
+    }
+
+    private void firebaseLogOut() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null){
+            FirebaseAuth.getInstance().signOut();
+            startActivity( mLogOutIntent);
+            finish();
+        }
     }
 
     private void googleLogOut(){
@@ -233,7 +259,7 @@ public class MainActivity extends AppCompatActivity
             mGoogleSignInClient.signOut().addOnCompleteListener( this, new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    startActivity( new Intent( MainActivity.this, LoginActivity.class ) );
+                    startActivity(mLogOutIntent);
                     finish();
                 }
             } );
@@ -250,11 +276,11 @@ public class MainActivity extends AppCompatActivity
                 LoginManager.getInstance().logOut();
                 Toast.makeText( MainActivity.this, "Logged Out", Toast.LENGTH_LONG ).show();
             }
-            startActivity( new Intent( MainActivity.this, LoginActivity.class ) );
+            startActivity(new Intent( mLogOutIntent));
             finish();
         }
 
-    private void updateProfilePicture(){
+    private void updateUserProfile(){
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
 
@@ -267,11 +293,59 @@ public class MainActivity extends AppCompatActivity
             try {
                 userName.setText( fbProfile.getFirstName() + " " + fbProfile.getLastName());
                 profilePicture.setProfileId(fbProfile.getId());
-
             }catch (Exception e){
                 Log.d("Facebook Profile Error", "error getting facebook profile data");
-
             }
+        }
+
+        //Firebase
+        getFirebaseUserDetails();
+        setFirebaseUserDetails();
+    }
+
+    private void checkAuthenticationState(){
+        Log.d(TAG, "checkAuthenticationState: checking authentication state.");
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null){
+            Log.d(TAG, "checkAuthenticationState: user is not Authenticated, Navigating back to Login Activity");
+            mLogOutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity( mLogOutIntent);
+            finish();
+        }else {
+            Log.d(TAG, "checkAuthenticationState: user is Authenticated");
+        }
+    }
+
+    private void getFirebaseUserDetails(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user!= null){
+            String uid = user.getUid();
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            Uri photoUrl = user.getPhotoUrl();
+        }
+    }
+
+    private void setFirebaseUserDetails(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null){
+            UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                    .setDisplayName("Place Holder") //TODO
+                    .setPhotoUri(Uri.parse("http://www.mstrafo.de/fileadmin/_processed_/b/1/csm_person-placeholder-male_5602d73d5e.png"))
+                    .build();
+            user.updateProfile( profileUpdate).addOnCompleteListener( new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()){
+                        Log.d( TAG, "onComplete: User Profile Updated." );
+                        //TODO
+                    }else {
+                        Log.d( TAG, "onComplete: User Profile Update Unsuccessful." );
+                    }
+                }
+            } );
         }
     }
 
