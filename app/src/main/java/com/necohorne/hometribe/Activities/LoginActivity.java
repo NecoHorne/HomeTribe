@@ -1,9 +1,13 @@
 package com.necohorne.hometribe.Activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -11,27 +15,33 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.necohorne.hometribe.Constants.Constants;
+import com.necohorne.hometribe.Activities.Dialog.ResendVerificationDialog;
+import com.necohorne.hometribe.Activities.Dialog.ResetPasswordDialog;
 import com.necohorne.hometribe.R;
 
+import io.fabric.sdk.android.Fabric;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static android.text.TextUtils.isEmpty;
@@ -39,8 +49,9 @@ import static android.text.TextUtils.isEmpty;
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
+    private Intent mLoggedInIntent;
 
-    //UI Widgets
+    //------------UI WIDGETS------------//
     private EditText email;
     private EditText password;
     private Button loginButton;
@@ -48,25 +59,30 @@ public class LoginActivity extends AppCompatActivity {
     private TextView forgotPassword;
     private TextView resendVerification;
 
-    //Firebase Email Login
+    //------------FIREBASE LOGIN------------//
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
-    //Facebook Login
+    //------------FACEBOOK LOGIN------------//
     private CallbackManager mCallbackManager;
 
-    //Google Login
+    //------------GOOGLE LOGIN------------//
     private GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleSignInClient;
-    private Intent mLoggedInIntent;
+    private FirebaseUser mUser;
 
 
+    //------------ACTIVITY LIFECYCLE------------//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
+        Fabric.with(this, new Crashlytics());
         setContentView( R.layout.activity_login );
         mLoggedInIntent = new Intent( LoginActivity.this, MainActivity.class );
+
+        mAuth = FirebaseAuth.getInstance();
+        mUser = mAuth.getCurrentUser();
 
         setupFirebaseAuth();
 
@@ -80,7 +96,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+
         if (AccessToken.getCurrentAccessToken() != null){
+            //signed in
             startActivity(mLoggedInIntent);
             finish();
         }
@@ -92,6 +110,7 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         }
 
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
 
         super.onStart();
@@ -105,6 +124,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    //------------LOGIN SETUP------------//
     private void emailLoginSetup(){
 
         email = (EditText) findViewById(R.id.login_activity_email_edit_text);
@@ -146,7 +166,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void forgotPass() {
-
+        ResetPasswordDialog dialog = new ResetPasswordDialog();
+        dialog.show( getFragmentManager(),"activity_reset_password");
     }
 
     private void resendVerEmail() {
@@ -189,12 +210,13 @@ public class LoginActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null){
+                mUser = firebaseAuth.getCurrentUser();
+                if (mUser != null){
                     //user is signed in
-                    if (user.isEmailVerified()){
-                        Log.d( TAG, "onAuthStateChanged: signed in" + user.getUid());
-                        startActivity(mLoggedInIntent);
+                    if (mUser.isEmailVerified()) {
+                        Log.d( TAG, "onAuthStateChanged: signed in" + mUser.getUid() );
+                        startActivity( mLoggedInIntent );
+                        finish();
                     }else {
                         Toast.makeText( LoginActivity.this, "Please Verify your email address", Toast.LENGTH_SHORT ).show();
                         FirebaseAuth.getInstance().signOut();
@@ -209,15 +231,21 @@ public class LoginActivity extends AppCompatActivity {
     private void FacebookLogin(){
         final com.facebook.login.LoginManager fbLoginManager;
 
+        Button facebook_login_button = (Button) findViewById( R.id.facebook_login_button );
         fbLoginManager = com.facebook.login.LoginManager.getInstance();
          mCallbackManager = CallbackManager.Factory.create();
+        facebook_login_button.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fbLoginManager.logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile"));
+            }
+        } );
+
         fbLoginManager.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
-                startActivity( mLoggedInIntent );
-                Toast.makeText( LoginActivity.this, "Logged In!", Toast.LENGTH_LONG ).show();
-                finish();
+                Log.d(TAG, "facebook:onSuccess:" + loginResult);
+                handleFacebookAccessToken(loginResult.getAccessToken());
             }
 
             @Override
@@ -230,16 +258,30 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText( LoginActivity.this, "Something went wrong", Toast.LENGTH_LONG ).show();
             }
         });
+    }
 
-        Button facebook_login_button = (Button) findViewById( R.id.facebook_login_button );
-        facebook_login_button.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fbLoginManager.logInWithReadPermissions(LoginActivity.this, Arrays.asList("email", "public_profile", "user_birthday"));
-            }
-        } );
+    private void handleFacebookAccessToken(AccessToken token) {
+        Log.d(TAG, "handleFacebookAccessToken:" + token);
 
-
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d(TAG, "signInWithCredential:success");
+                            mUser = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "Logged In!", Toast.LENGTH_SHORT).show();
+                            startActivity(mLoggedInIntent);
+                            finish();
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void googleLogin(){
@@ -258,6 +300,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         mCallbackManager.onActivityResult( requestCode, resultCode, data );
 
         if (requestCode == RC_SIGN_IN) {
@@ -284,6 +327,5 @@ public class LoginActivity extends AppCompatActivity {
             Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
         }
     }
+
 }
-
-

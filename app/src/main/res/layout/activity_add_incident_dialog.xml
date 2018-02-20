@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context="com.necohorne.hometribe.Activities.AddIncidentDialog">
+    tools:context="com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog"
+    android:background="@drawable/alert_dialog_background">
 
     <Spinner
         android:id="@+id/report_incident_spinner"
-        android:layout_width="395dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
@@ -16,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"/>
 
     <TextView
         android:id="@+id/textView"
@@ -36,46 +37,19 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/report_incident_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Incident Date"
-        android:inputType="date"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
-
-    <EditText
         android:id="@+id/report_incident_time"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="47dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Incident Time"
         android:inputType="time"
+        android:textColorHint="@color/White"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_date" />
-
-    <EditText
-        android:id="@+id/report_incident_location"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Address / Location"
-        android:inputType="textPostalAddress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_time" />
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_month" />
 
     <EditText
         android:id="@+id/report_incident_description"
@@ -87,9 +61,11 @@
         android:ems="10"
         android:hint="Description"
         android:inputType="textMultiLine"
+        android:textColorHint="@color/White"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_location" />
+        app:layout_constraintTop_toBottomOf="@+id/incident_report_street_name" />
 
     <EditText
         android:id="@+id/report_incident_cas_number"
@@ -97,11 +73,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
         android:hint="Police CAS Number"
         android:inputType="text"
+        android:textColorHint="@color/White"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/report_incident_description" />
 
@@ -110,11 +88,146 @@
         android:layout_width="43dp"
         android:layout_height="39dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="52dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_report_problem_black_24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.709"
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/report_incident_submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/button_rectangle"
+        android:paddingHorizontal="5dp"
+        android:text="Report Incident"
+        android:textColor="@color/White"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_cas_number" />
+
+    <AutoCompleteTextView
+        android:id="@+id/report_incident_town"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="City / Town"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/incident_province_spinner" />
+
+    <EditText
+        android:id="@+id/report_incident_street_num"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Street #"
+        android:inputType="number"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintBottom_toTopOf="@+id/report_incident_description"
+        app:layout_constraintEnd_toStartOf="@+id/incident_report_street_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_town"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <EditText
+        android:id="@+id/incident_report_street_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Street Name"
+        android:inputType="text"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/report_incident_street_num"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_town" />
+
+    <Spinner
+        android:id="@+id/incident_province_spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_time" />
+
+    <EditText
+        android:id="@+id/report_incident_day"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="DD"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintBottom_toTopOf="@+id/report_incident_time"
+        app:layout_constraintEnd_toStartOf="@+id/report_incident_month"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
+
+    <EditText
+        android:id="@+id/report_incident_month"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="MM"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintEnd_toStartOf="@+id/report_incident_year"
+        app:layout_constraintStart_toEndOf="@+id/report_incident_day"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
+
+    <EditText
+        android:id="@+id/report_incident_year"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="YYYY"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:textColor="@color/White"
+        android:textColorHint="@color/White"
+        app:layout_constraintBottom_toTopOf="@+id/report_incident_time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/report_incident_month"
+        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
+
 </android.support.constraint.ConstraintLayout>

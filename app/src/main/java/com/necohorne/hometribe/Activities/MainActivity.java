@@ -48,6 +48,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
 import com.necohorne.hometribe.R;
 
 
@@ -59,25 +60,27 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
 
     private static final String TAG = "MainActivity";
+    private Intent mLogOutIntent;
 
-    //location objects
+    //------------LOCATION OBJECTS------------//
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
+    private LatLng mCurrentLocation;
 
-    //login objects
+    //------------LOGIN OBJECTS------------//
     private static AccessToken mAccessToken;
     private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInAccount mAccount;
     private GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
 
-    //user profile
+    //------------USER PROFILE------------//
     private ProfilePictureView profilePicture;
     private TextView userName;
     private static Profile fbProfile;
 
-    //Bottom Nav object
+    //------------BOTTOM MENU BAR------------//
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
@@ -89,7 +92,8 @@ public class MainActivity extends AppCompatActivity
 //                     open chat window drawer
                     return true;
                 case R.id.bottom_nav_incident:
-//                    alert dialog logging an incident
+                    AddIncidentDialog dialog = new AddIncidentDialog();
+                    dialog.show( getFragmentManager(), "activity_add_incident_dialog" );
                     return true;
             }
             return false;
@@ -101,9 +105,7 @@ public class MainActivity extends AppCompatActivity
         fbProfile = Profile.getCurrentProfile();
     }
 
-    private Intent mLogOutIntent;
-
-    //Activity Lifecycle
+    //------------ACTIVITY LIFECYCLE------------//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState );
@@ -136,7 +138,7 @@ public class MainActivity extends AppCompatActivity
         floatingActionButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setUpLocation();
+                currentLocation(mCurrentLocation);
                 Toast.makeText( MainActivity.this, "Current Location", Toast.LENGTH_LONG).show();
             }
         } );
@@ -177,7 +179,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //Menus
+    //------------MENUS------------//
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -195,6 +197,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.menu_log_out:
                 logOut();
+                break;
+            case  R.id.account_settings:
+                //TODO
                 break;
         }
         return super.onOptionsItemSelected( item );
@@ -235,7 +240,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    //Login and user code
+    //------------USER / PROFILE / LOGIN------------//
     private void logOut() {
         facebookLogOut();
         googleLogOut();
@@ -253,9 +258,9 @@ public class MainActivity extends AppCompatActivity
 
     private void googleLogOut(){
 
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        mAccount = GoogleSignIn.getLastSignedInAccount(this);
 
-        if (account != null) {
+        if (mAccount != null) {
             mGoogleSignInClient.signOut().addOnCompleteListener( this, new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -307,7 +312,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "checkAuthenticationState: checking authentication state.");
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
+        if (user == null && mAccessToken != null && mAccount == null){
             Log.d(TAG, "checkAuthenticationState: user is not Authenticated, Navigating back to Login Activity");
             mLogOutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity( mLogOutIntent);
@@ -349,7 +354,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // Maps
+    //------------MAPS------------//
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -366,19 +371,8 @@ public class MainActivity extends AppCompatActivity
             public void onLocationChanged(Location location) {
                 Log.d( "location ", location.toString() );
                 mMap.clear();
-
-                LatLng newLocation = new LatLng( location.getLatitude(), location.getLongitude());
-
-                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                try {
-                    List<Address> addressList = geocoder.getFromLocation( newLocation.latitude, newLocation.longitude, 1 );
-
-                    mMap.addMarker( new MarkerOptions().position(newLocation ).title( addressList.get(0).getAddressLine(0)));
-                    mMap.moveCamera( CameraUpdateFactory.newLatLngZoom(newLocation, 13) );
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                mCurrentLocation = new LatLng( location.getLatitude(), location.getLongitude());
+                currentLocation( mCurrentLocation);
             }
 
             @Override
@@ -400,9 +394,24 @@ public class MainActivity extends AppCompatActivity
         if (ContextCompat.checkSelfPermission( this,
                 Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
             //Ask User for permission
-            ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1 );
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 0, 0, locationListener );
+            //locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+        }
+    }
+
+    public void currentLocation(LatLng currentLocation){
+
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation( currentLocation.latitude, currentLocation.longitude, 1 );
+
+            mMap.addMarker( new MarkerOptions().position( currentLocation ).title( addressList.get(0).getAddressLine(0)));
+            mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( currentLocation, 13) );
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

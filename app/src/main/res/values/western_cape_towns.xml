@@ -1,0 +1,928 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="western_cape_towns">
+        <item>Aan de Doorns</item>
+        <item>Aangenaam</item>
+        <item>Aasfontein</item>
+        <item>Agulhas</item>
+        <item>Albertina</item>
+        <item>Albertinia</item>
+        <item>Albertiniahotel</item>
+        <item>Alfalfa</item>
+        <item>Alphen</item>
+        <item>Alphen Bridge</item>
+        <item>Alphenbrug</item>
+        <item>Amalienstein</item>
+        <item>An-de-Waterkant</item>
+        <item>Angora</item>
+        <item>Anysberg</item>
+        <item>Aprilskraal</item>
+        <item>Arniston</item>
+        <item>Ashton</item>
+        <item>Askraal</item>
+        <item>Athlone</item>
+        <item>Atlantis</item>
+        <item>Aurora</item>
+        <item>Avontuur</item>
+        <item>Baardscheerderbosch</item>
+        <item>Baardscheerdersbosch</item>
+        <item>Baardskeerderbos</item>
+        <item>Baardskeerdersbos</item>
+        <item>Bailey's Cottage</item>
+        <item>Bain's Kloof</item>
+        <item>Bakklysdrift</item>
+        <item>Bakoven</item>
+        <item>Balmoral</item>
+        <item>Banghoek</item>
+        <item>Banhoek</item>
+        <item>Bantry Bay</item>
+        <item>Barandas</item>
+        <item>Barrington</item>
+        <item>Barrydale</item>
+        <item>Baviaanshoek</item>
+        <item>Bayview</item>
+        <item>Beacon Island Estate</item>
+        <item>Beaufort West</item>
+        <item>Beaufort-Wes</item>
+        <item>Belhar</item>
+        <item>Bella Vista</item>
+        <item>Belle Ombre</item>
+        <item>Bellville</item>
+        <item>Bellville South</item>
+        <item>Belthorn</item>
+        <item>Berea</item>
+        <item>Bereaville</item>
+        <item>Bergplaas</item>
+        <item>Bergplaats</item>
+        <item>Bergrivier</item>
+        <item>Bergsig</item>
+        <item>Bergvliet</item>
+        <item>Bergwater</item>
+        <item>Betty's Bay</item>
+        <item>Bettysbaai</item>
+        <item>Bibby's Hoek</item>
+        <item>Biejesfontein</item>
+        <item>Bierberg</item>
+        <item>Biesiesfontein</item>
+        <item>Biesjesfontein</item>
+        <item>Bishop Lavis</item>
+        <item>Bishopscourt</item>
+        <item>Bitterfontein</item>
+        <item>Bitterwater</item>
+        <item>Blanco</item>
+        <item>Bland's Drift</item>
+        <item>Blauwvlei</item>
+        <item>Blesmerrie</item>
+        <item>Blomtuin</item>
+        <item>Bloubergsvlei</item>
+        <item>Bloupunt</item>
+        <item>Boesmanspad</item>
+        <item>Bo-Koega</item>
+        <item>Bo-Kouga</item>
+        <item>Bomakierie</item>
+        <item>Bongoletu</item>
+        <item>Bonnievale</item>
+        <item>Bonteheuwel</item>
+        <item>Bontheuwel</item>
+        <item>Boplaas</item>
+        <item>Borcherds</item>
+        <item>Bosmanskloof</item>
+        <item>Bot River</item>
+        <item>Bothasig</item>
+        <item>Bothastrand</item>
+        <item>Botrivier</item>
+        <item>Bottelary</item>
+        <item>Botterkloof</item>
+        <item>Bovenfontein</item>
+        <item>Bovenplaats</item>
+        <item>Bracken Hill</item>
+        <item>Brackenfell</item>
+        <item>Brakenfell</item>
+        <item>Brakfontein</item>
+        <item>Brakfontein A</item>
+        <item>Brakkefontein</item>
+        <item>Brandfontein</item>
+        <item>Brandrivier</item>
+        <item>Brandvlei</item>
+        <item>Brandwacht</item>
+        <item>Brandwag</item>
+        <item>Bredasdorp</item>
+        <item>Breede River</item>
+        <item>Breërivier</item>
+        <item>Brenton-on-Sea</item>
+        <item>Bridgetown</item>
+        <item>Brightwater</item>
+        <item>Brooklands</item>
+        <item>Brooklyn</item>
+        <item>Brookwood</item>
+        <item>Bruintjiesrivier</item>
+        <item>Buffeljags River</item>
+        <item>Buffeljagsrivier</item>
+        <item>Buffelsbaai</item>
+        <item>Buffelsdrif</item>
+        <item>Buffelsdrift</item>
+        <item>Buffelskloof</item>
+        <item>Bushman Drannings</item>
+        <item>Cafda Village</item>
+        <item>Caledon</item>
+        <item>Calitzdorp</item>
+        <item>Camfer</item>
+        <item>Camphill Village</item>
+        <item>Camps Bay</item>
+        <item>Cape Town</item>
+        <item>Ceres</item>
+        <item>Chalsworth</item>
+        <item>Charleston Hill</item>
+        <item>Charlestown</item>
+        <item>Chatsworth</item>
+        <item>Chemory</item>
+        <item>Churchhaven</item>
+        <item>Citrusdal</item>
+        <item>Clanwilliam</item>
+        <item>Clanwillian</item>
+        <item>Claremont</item>
+        <item>Clareport</item>
+        <item>Clifton</item>
+        <item>Cloeteskraal</item>
+        <item>Cloetesville</item>
+        <item>Clovelly</item>
+        <item>Conradie</item>
+        <item>Constantia</item>
+        <item>Covie</item>
+        <item>Cravenby</item>
+        <item>Crawford</item>
+        <item>Crawley</item>
+        <item>Crossroads</item>
+        <item>Da Gama Park</item>
+        <item>Da Nova</item>
+        <item>Dagbreek</item>
+        <item>Dal Josafat</item>
+        <item>D'Almeida</item>
+        <item>Dalsig</item>
+        <item>Danabaai</item>
+        <item>Danga</item>
+        <item>Darling</item>
+        <item>De Doorns</item>
+        <item>De Grendel</item>
+        <item>De Grendle Farm</item>
+        <item>De Hoek</item>
+        <item>De Meul</item>
+        <item>De Novo</item>
+        <item>De Nysna</item>
+        <item>De Rust</item>
+        <item>Deepwalls</item>
+        <item>Delville Park</item>
+        <item>Dennehof</item>
+        <item>Diasstrand</item>
+        <item>Diazville</item>
+        <item>Dido Valley</item>
+        <item>Die Barakke</item>
+        <item>Die Dam</item>
+        <item>Die Erwe</item>
+        <item>Die Grendel</item>
+        <item>Die Hoek</item>
+        <item>Die Kelders</item>
+        <item>Die Vlug</item>
+        <item>Dieprivier</item>
+        <item>Diepwalle</item>
+        <item>Donkergat</item>
+        <item>Doordrift</item>
+        <item>Doornbaai</item>
+        <item>Doornrivier</item>
+        <item>Doornriviervlei</item>
+        <item>Doring Bay</item>
+        <item>Doringbaai</item>
+        <item>Drew</item>
+        <item>Drieankerbaai</item>
+        <item>Droëvlakte</item>
+        <item>Droëvlei</item>
+        <item>Droogevlakte</item>
+        <item>Du Toitskloof</item>
+        <item>Du Toitskloot</item>
+        <item>Duiwe River</item>
+        <item>Duiwerivier</item>
+        <item>D'Urban</item>
+        <item>Durbanville</item>
+        <item>Durbanville Hills</item>
+        <item>Dwarskersbos</item>
+        <item>Dwarskersenbosch</item>
+        <item>Dysseldorp</item>
+        <item>Dysselsdorp</item>
+        <item>Ebenezer</item>
+        <item>Ebenhaeser</item>
+        <item>Edgemead</item>
+        <item>Edmonton</item>
+        <item>Eendekuil</item>
+        <item>Eerste River</item>
+        <item>Eerste River Village</item>
+        <item>Eersterivier</item>
+        <item>Eersterivier Settlement</item>
+        <item>Eikenhof</item>
+        <item>Elands Bay</item>
+        <item>Elandsbaai</item>
+        <item>Elandsfontein</item>
+        <item>Elgin</item>
+        <item>Elim</item>
+        <item>Elsenburg</item>
+        <item>Elsiesrivier</item>
+        <item>eNduli</item>
+        <item>Epping</item>
+        <item>Epping Forest</item>
+        <item>Eselfontein</item>
+        <item>Eseljag</item>
+        <item>Eureka</item>
+        <item>Eversdal</item>
+        <item>Ezeljacht</item>
+        <item>Factreton</item>
+        <item>Far Forest</item>
+        <item>Faure</item>
+        <item>Fernwood</item>
+        <item>Fishhoek</item>
+        <item>Flat Acres</item>
+        <item>Formosa</item>
+        <item>Franschhoek</item>
+        <item>Franskraal</item>
+        <item>Franskraalstrand</item>
+        <item>French Hoek</item>
+        <item>Fresnave</item>
+        <item>Gans Bay</item>
+        <item>Gansbaai</item>
+        <item>Garden Village</item>
+        <item>Gardens</item>
+        <item>Gaylee</item>
+        <item>Geduld</item>
+        <item>Geelwal</item>
+        <item>Gelukshoop</item>
+        <item>Genadendal</item>
+        <item>Genasfontein</item>
+        <item>George</item>
+        <item>Georgida</item>
+        <item>Glen Dirk</item>
+        <item>Glencairn</item>
+        <item>Glencairn Heights</item>
+        <item>Glentana</item>
+        <item>Goede Hoop</item>
+        <item>Goedgeloof</item>
+        <item>Goedgemoed</item>
+        <item>Goedgemond</item>
+        <item>Goedverwacht</item>
+        <item>Goedverwag</item>
+        <item>Good Hope</item>
+        <item>Goodwood</item>
+        <item>Gordon's Bay</item>
+        <item>Gordon's Camp</item>
+        <item>Gordonsbaai</item>
+        <item>Gouda</item>
+        <item>Goudini</item>
+        <item>Goudini Road</item>
+        <item>Goudinie</item>
+        <item>Goudiniweg</item>
+        <item>Goukama</item>
+        <item>Goukamma</item>
+        <item>Gouna</item>
+        <item>Graafwater</item>
+        <item>Grabouw</item>
+        <item>Grassy Park</item>
+        <item>Great Brak River</item>
+        <item>Green Point</item>
+        <item>Greenhaven</item>
+        <item>Greyton</item>
+        <item>Groendal</item>
+        <item>Groenfontein</item>
+        <item>Groenpunt</item>
+        <item>Groot Matjiesfontein</item>
+        <item>Groot Silwermyn</item>
+        <item>Groot Zwaarmoed</item>
+        <item>Groot-Brakrivier</item>
+        <item>Grootfontein</item>
+        <item>Groot-Jongensfontein</item>
+        <item>Grootjongensfonteinstrand</item>
+        <item>Grootrivier</item>
+        <item>Guguletu</item>
+        <item>Haarlem</item>
+        <item>Hannskop</item>
+        <item>Hanover Park</item>
+        <item>Happy Valley</item>
+        <item>Harkerville</item>
+        <item>Harmony</item>
+        <item>Hartebeeskraal</item>
+        <item>Hartebeesrivier</item>
+        <item>Hartebeest Rivier</item>
+        <item>Hartebeestkraal</item>
+        <item>Hartenbos</item>
+        <item>Hawston</item>
+        <item>Hazenjacht</item>
+        <item>Heatherlands</item>
+        <item>Heathfield</item>
+        <item>Heidelberg</item>
+        <item>Heideveld</item>
+        <item>Helderberg</item>
+        <item>Helderberg College</item>
+        <item>Helderstroom</item>
+        <item>Hemelraad</item>
+        <item>Herbertsdale</item>
+        <item>Hermanus</item>
+        <item>Hermon</item>
+        <item>Herold</item>
+        <item>Heroldsbaai</item>
+        <item>Het Kruis</item>
+        <item>Hex River</item>
+        <item>Hexrivier</item>
+        <item>Hiddingh</item>
+        <item>Higgovale</item>
+        <item>High Riding</item>
+        <item>Highland Home</item>
+        <item>Hoedjes Bay</item>
+        <item>Hoedjesbaai</item>
+        <item>Hoeko</item>
+        <item>Hoekwil</item>
+        <item>Hoekwill</item>
+        <item>Hoetjes Bay</item>
+        <item>Hooikraal</item>
+        <item>Hoopvol</item>
+        <item>Hopefield</item>
+        <item>Hornlee</item>
+        <item>Hot Springs</item>
+        <item>Hotagterklip</item>
+        <item>Hou Moed</item>
+        <item>Houhoek</item>
+        <item>Hout Bay</item>
+        <item>Houtbaai</item>
+        <item>Idas Valley</item>
+        <item>Idasvallei</item>
+        <item>Imhoff's Gift</item>
+        <item>Infanta</item>
+        <item>Jakkalsvlei</item>
+        <item>Jamestown</item>
+        <item>Johnson's Post</item>
+        <item>Jongensfontein</item>
+        <item>Jonkersberg</item>
+        <item>Jukfontein</item>
+        <item>Kaapstad</item>
+        <item>Kalabaskraal</item>
+        <item>Kalbaskraal</item>
+        <item>Kalk Bay</item>
+        <item>Kalkbaai</item>
+        <item>Kalkoond</item>
+        <item>Kamanassiedam</item>
+        <item>Kammanassiedam</item>
+        <item>Kampsbaai</item>
+        <item>Karatara</item>
+        <item>Karatara Settlement</item>
+        <item>Karoetjieskop</item>
+        <item>Karwyderskraal</item>
+        <item>Katzenberg</item>
+        <item>Kayamnandi</item>
+        <item>Kenridge</item>
+        <item>Kensington</item>
+        <item>Kerkrand</item>
+        <item>Kerksrand</item>
+        <item>Keurbooms River</item>
+        <item>Keurbooms Strand</item>
+        <item>Keurboomsrivier</item>
+        <item>Keurboomstrand</item>
+        <item>Keurbos</item>
+        <item>Keurbosch</item>
+        <item>Keurhoek</item>
+        <item>Keysers</item>
+        <item>Khayelitsha</item>
+        <item>Kilfinan</item>
+        <item>Kingfisher Creek</item>
+        <item>Klaarstroom</item>
+        <item>Klaasiagersberg</item>
+        <item>Klaasjagersberg</item>
+        <item>Klarer</item>
+        <item>Klaver</item>
+        <item>Klawer</item>
+        <item>Klein Bergrivier</item>
+        <item>Klein Silwermyn</item>
+        <item>Klein Steenberg</item>
+        <item>Kleinbaai</item>
+        <item>Kleinberg</item>
+        <item>Klein-Brakrivier</item>
+        <item>Klein-Brakrivierstrand</item>
+        <item>Klein-Drakenstein</item>
+        <item>Kleinfontein</item>
+        <item>Kleinmond</item>
+        <item>Kleinmondstrand</item>
+        <item>Kleinplaat</item>
+        <item>Kleinplaats</item>
+        <item>Kleinrivier</item>
+        <item>Kleinstraat</item>
+        <item>Kleinvlei</item>
+        <item>Klipdale</item>
+        <item>Klipdrif</item>
+        <item>Klipfontein</item>
+        <item>Klipheuwel</item>
+        <item>Klipkraal</item>
+        <item>Kliprand</item>
+        <item>Knysna</item>
+        <item>Koelfontein</item>
+        <item>Kogelfontein</item>
+        <item>Kommetje</item>
+        <item>Kommetjie</item>
+        <item>Koningsrivier</item>
+        <item>Kontiki</item>
+        <item>Koo</item>
+        <item>Koringberg</item>
+        <item>Koude Rivier</item>
+        <item>Kraaifontein</item>
+        <item>Kranshoek Griekwa Nedersetting</item>
+        <item>Krigedam</item>
+        <item>Kruis River</item>
+        <item>Kruiskloof</item>
+        <item>Kruisrivier</item>
+        <item>Kruisvallei</item>
+        <item>Kuils River</item>
+        <item>Kuilsrivier</item>
+        <item>Kwaggaskloofdam</item>
+        <item>Kylemore</item>
+        <item>Laaiplek</item>
+        <item>Laangebaan Village</item>
+        <item>Laatsrivier</item>
+        <item>Ladismith</item>
+        <item>L'Agulhas</item>
+        <item>Laingsburg</item>
+        <item>Lake Marina</item>
+        <item>Lakeside</item>
+        <item>Lambert's Bay</item>
+        <item>Lambertsbaai</item>
+        <item>Langa</item>
+        <item>Langa Location</item>
+        <item>Langa Native Location</item>
+        <item>Langebaan</item>
+        <item>Langebaan Road</item>
+        <item>Langebaanweg</item>
+        <item>Langkloof</item>
+        <item>Lansdowne</item>
+        <item>Lappies Bay</item>
+        <item>Lappiesbaai</item>
+        <item>Laudina</item>
+        <item>Lavender Hill</item>
+        <item>Le Souvenir</item>
+        <item>Leeu-Gamka</item>
+        <item>Leeuwbosch</item>
+        <item>Leipoldtville</item>
+        <item>Leipoldville</item>
+        <item>Lepelfontein Nedersetting</item>
+        <item>Linkside</item>
+        <item>Little Brak River</item>
+        <item>Llandudno</item>
+        <item>Loch Venus</item>
+        <item>Lochlynne</item>
+        <item>Lopende River</item>
+        <item>Lopenderivier</item>
+        <item>Lotus River</item>
+        <item>Lutzville</item>
+        <item>Macassar</item>
+        <item>Maitland</item>
+        <item>Malagas</item>
+        <item>Malay Quarter</item>
+        <item>Malgas</item>
+        <item>Malkopvlei</item>
+        <item>Malmesbury</item>
+        <item>Mamre</item>
+        <item>Mandalay</item>
+        <item>Manenberg</item>
+        <item>Marina da Gama</item>
+        <item>Marionhof</item>
+        <item>Matjesfontein</item>
+        <item>Matjesrivier</item>
+        <item>Matjies River</item>
+        <item>Matjiesfontein</item>
+        <item>Matjieskloof</item>
+        <item>Matjiesrivier</item>
+        <item>Matroosfontein</item>
+        <item>McGregor</item>
+        <item>Meadowridge</item>
+        <item>Melkboschstrand</item>
+        <item>Melkbosstrand</item>
+        <item>Melkhoutfontein</item>
+        <item>Merweville</item>
+        <item>Mfuleni</item>
+        <item>Middelbosjesveld</item>
+        <item>Middelplaas</item>
+        <item>Middelplaats</item>
+        <item>Middleton</item>
+        <item>Mike</item>
+        <item>Mikes</item>
+        <item>Milnerton</item>
+        <item>Mispah</item>
+        <item>Mitchells Plain</item>
+        <item>Molen Drift</item>
+        <item>Molshoop</item>
+        <item>Montagu</item>
+        <item>Montague Gardens</item>
+        <item>Montana</item>
+        <item>Monte Vista</item>
+        <item>Monteray</item>
+        <item>Moordkuil</item>
+        <item>Moorreesburg</item>
+        <item>Morelig</item>
+        <item>Moreson</item>
+        <item>Morning Star</item>
+        <item>Mossel Bay</item>
+        <item>Mossel River</item>
+        <item>Mosselbaai</item>
+        <item>Mosselrivier</item>
+        <item>Mouille Point</item>
+        <item>Mowbray</item>
+        <item>Muishondfontein</item>
+        <item>Muiskop</item>
+        <item>Muizenberg</item>
+        <item>Murdoch Valley</item>
+        <item>Murraysburg</item>
+        <item>Nacht Wacht</item>
+        <item>Nag Wag</item>
+        <item>Napier</item>
+        <item>Nature's Valley</item>
+        <item>Nelspoort</item>
+        <item>Nenta</item>
+        <item>Neptune's Corner</item>
+        <item>New Horizons</item>
+        <item>New Look</item>
+        <item>New Sunnyside</item>
+        <item>Newlands</item>
+        <item>Newtons</item>
+        <item>Newtown</item>
+        <item>Nieuwe Drift</item>
+        <item>Nieuwefontein</item>
+        <item>Nieuwerust</item>
+        <item>Niewefontein</item>
+        <item>Nissenville</item>
+        <item>Noetsie</item>
+        <item>Noetsie Knysna</item>
+        <item>Noetzie</item>
+        <item>Noll</item>
+        <item>Nolls Halt</item>
+        <item>Nooitgedacht</item>
+        <item>Noorder-Paarl</item>
+        <item>Noordhoek</item>
+        <item>Norwood</item>
+        <item>Nuwedorp</item>
+        <item>Nuweland</item>
+        <item>Nuwerus</item>
+        <item>Nuy</item>
+        <item>Nyanga</item>
+        <item>Oakdale</item>
+        <item>Oaklands</item>
+        <item>Oatlands</item>
+        <item>Observatory</item>
+        <item>Ocean View</item>
+        <item>Olkersia</item>
+        <item>Onder-Papegaaiberg</item>
+        <item>Onrus</item>
+        <item>Onrust</item>
+        <item>Onrustrivier</item>
+        <item>Ons Rust</item>
+        <item>Op-die-Berg</item>
+        <item>Orangezig</item>
+        <item>Oranjezicht</item>
+        <item>Oteniekwa</item>
+        <item>Ottery</item>
+        <item>Ouda Brug</item>
+        <item>Oude Bosch</item>
+        <item>Oude Kraal</item>
+        <item>Oude Raapkraal</item>
+        <item>Oude Scheur</item>
+        <item>Oudebrug</item>
+        <item>Oudekraal</item>
+        <item>Oudekraal</item>
+        <item>Oudekraalfontein</item>
+        <item>Oudtshoorn</item>
+        <item>Oukraal</item>
+        <item>Ouland</item>
+        <item>Ouplaas</item>
+        <item>Ouplass</item>
+        <item>Outeniekwa</item>
+        <item>Outeniqua</item>
+        <item>Oysseldorp</item>
+        <item>Paardeneiland</item>
+        <item>Paarl</item>
+        <item>Pacaltsdorp</item>
+        <item>Pacaltsdrop</item>
+        <item>Pampoenkraal</item>
+        <item>Papendorp</item>
+        <item>Papies Vlei Mission</item>
+        <item>Papiesvlei</item>
+        <item>Parkwood</item>
+        <item>Parow</item>
+        <item>Parowvallei</item>
+        <item>Paternoster</item>
+        <item>Paviesvlei</item>
+        <item>Pearly Beach</item>
+        <item>Penhill</item>
+        <item>Phanthom Acres</item>
+        <item>Phantom Acres</item>
+        <item>Philadelphia</item>
+        <item>Philippi</item>
+        <item>Philipsdale</item>
+        <item>Piketberg</item>
+        <item>Piketburg</item>
+        <item>Pinegrove</item>
+        <item>Pinelands</item>
+        <item>Pineview</item>
+        <item>Piquetberg</item>
+        <item>Platdrift</item>
+        <item>Plathuis</item>
+        <item>Plettenberg Bay</item>
+        <item>Plettenbergbaai</item>
+        <item>Plumstead</item>
+        <item>Pneil</item>
+        <item>Pniel</item>
+        <item>Port Beaufort</item>
+        <item>Porterville</item>
+        <item>Prince Albert</item>
+        <item>Prince Alfred Hamlet</item>
+        <item>Prince Alfreds Hamlet</item>
+        <item>Pringle Bay</item>
+        <item>Prins Albert</item>
+        <item>Prinskraal</item>
+        <item>Protem</item>
+        <item>Raape Kraal</item>
+        <item>Raapkraal</item>
+        <item>Rahloux</item>
+        <item>Ravensmead</item>
+        <item>Rawsonville</item>
+        <item>Redelinghuis</item>
+        <item>Redelinghuys</item>
+        <item>Reebok</item>
+        <item>Remhoogte</item>
+        <item>Restvale</item>
+        <item>Rheboksfontein</item>
+        <item>Rhebokskraal</item>
+        <item>Rheeboks Kraal</item>
+        <item>Riebeek West</item>
+        <item>Riebeek-Kasteel</item>
+        <item>Riebeek-Wes</item>
+        <item>Rietfontein</item>
+        <item>Riethuiskraal</item>
+        <item>Rietpoort</item>
+        <item>Rietvlei Number 1</item>
+        <item>Riverlands</item>
+        <item>Riversdal</item>
+        <item>Riversdale</item>
+        <item>Riverside</item>
+        <item>Rivier Zonder End</item>
+        <item>Riviersonderend</item>
+        <item>Robertson</item>
+        <item>Robertsvlei</item>
+        <item>Rocklands</item>
+        <item>Roggebaai</item>
+        <item>Roggeveld</item>
+        <item>Roggevlei</item>
+        <item>Romans River</item>
+        <item>Romansrivier</item>
+        <item>Rooi River</item>
+        <item>Rooidriffie</item>
+        <item>Rooiels</item>
+        <item>Rooiloop</item>
+        <item>Rooirivier</item>
+        <item>Rosebank</item>
+        <item>Rosemoor</item>
+        <item>Rosendal</item>
+        <item>Rozendale Farm</item>
+        <item>Rugby</item>
+        <item>Ruiterbosch</item>
+        <item>Ruitersbos</item>
+        <item>Rusoord</item>
+        <item>Rustoord</item>
+        <item>Ruytersbosch</item>
+        <item>Rylands Estate</item>
+        <item>Saarsveld Forestry School</item>
+        <item>Saasveld</item>
+        <item>Saint Helena Bay</item>
+        <item>Saint Helenabaai</item>
+        <item>Saint James</item>
+        <item>Saldanha</item>
+        <item>Salt River</item>
+        <item>Sandbaai</item>
+        <item>Sandberg</item>
+        <item>Sanddrift</item>
+        <item>Sandhills</item>
+        <item>Sandhoogte</item>
+        <item>Sandrivier</item>
+        <item>Saron</item>
+        <item>Sauer</item>
+        <item>Scarborough</item>
+        <item>Scheepersrus</item>
+        <item>Scheepersrust</item>
+        <item>Schoemanshoek</item>
+        <item>Schoongezicht</item>
+        <item>Schotschekloof</item>
+        <item>Scottville</item>
+        <item>Sea Point</item>
+        <item>Seaforth</item>
+        <item>Sedgefield</item>
+        <item>Seepunt</item>
+        <item>Seven Weeks Poort</item>
+        <item>Seweweekspoort</item>
+        <item>Sheepwalk</item>
+        <item>Shoebury Heights</item>
+        <item>Sidneyvale</item>
+        <item>Silver Sands</item>
+        <item>Silverhurst</item>
+        <item>Silvertown</item>
+        <item>Silwermyn</item>
+        <item>Simon's Town</item>
+        <item>Simonstad</item>
+        <item>Skerpenhevwel</item>
+        <item>Skilpadgat</item>
+        <item>Skipskop</item>
+        <item>Slanghoek</item>
+        <item>Somerset West</item>
+        <item>Somersetwes</item>
+        <item>Sonquasdrif</item>
+        <item>Sonskyn</item>
+        <item>Sonstraal</item>
+        <item>Southfield</item>
+        <item>Soutrivier</item>
+        <item>Speelmansrivier</item>
+        <item>Spes Bona</item>
+        <item>Spies</item>
+        <item>Spitskop</item>
+        <item>Spitzkop</item>
+        <item>Springbok</item>
+        <item>Square Hill</item>
+        <item>Standplaas</item>
+        <item>Standplaats</item>
+        <item>Stanford</item>
+        <item>Steelwater</item>
+        <item>Steenberg</item>
+        <item>Steenbras</item>
+        <item>Stellenberg</item>
+        <item>Stellenbosch</item>
+        <item>Stilbaai</item>
+        <item>Stilbaai-Oos</item>
+        <item>Stilbaaistrand</item>
+        <item>Stilbaai-Wes</item>
+        <item>Still Bay</item>
+        <item>Still Bay East</item>
+        <item>Still Bay Strand</item>
+        <item>Still Bay West</item>
+        <item>Stockville</item>
+        <item>Stompneus Bay</item>
+        <item>Stompneusbaai</item>
+        <item>Stormsvlei</item>
+        <item>Strand</item>
+        <item>Strandfontein</item>
+        <item>Strandskloof</item>
+        <item>Struis Bay</item>
+        <item>Struisbaai</item>
+        <item>Suiderkruis</item>
+        <item>Suider-Paarl</item>
+        <item>Sun Valley</item>
+        <item>Sunny Seas</item>
+        <item>Sunnyacres</item>
+        <item>Sunnycroft</item>
+        <item>Sunnyside</item>
+        <item>Surrey Estate</item>
+        <item>Surrey Estates</item>
+        <item>Suurbraak</item>
+        <item>Swartklip</item>
+        <item>Swartwater</item>
+        <item>Sweet Valley</item>
+        <item>Swellendam</item>
+        <item>Swiss Farm</item>
+        <item>Table View</item>
+        <item>Tahiti</item>
+        <item>Takkap</item>
+        <item>Tamboerskloof</item>
+        <item>Tergniet</item>
+        <item>Teslaarsdal</item>
+        <item>The Boulders</item>
+        <item>The Crags</item>
+        <item>The Homestead</item>
+        <item>The Island</item>
+        <item>Theerivier</item>
+        <item>Thornton</item>
+        <item>Three Anchor Bay</item>
+        <item>Tokai</item>
+        <item>Touws River</item>
+        <item>Touwsrivier</item>
+        <item>Tulbagh</item>
+        <item>Tulbagh Road</item>
+        <item>Tulbaghweg</item>
+        <item>Tweefontein</item>
+        <item>Tygerberg Hills</item>
+        <item>Uilenkraal</item>
+        <item>Uilkraalmond</item>
+        <item>Uitkoms</item>
+        <item>Uitvlugt</item>
+        <item>Uniondale</item>
+        <item>Uniondale Road</item>
+        <item>Uniondaleweg</item>
+        <item>Upper Kouga</item>
+        <item>Van Rhynsdorf</item>
+        <item>Van Riebeeckstrand</item>
+        <item>Van Wijksdorp</item>
+        <item>Van Wyksdorp</item>
+        <item>Vanrhynsdorp</item>
+        <item>Varkieskloof</item>
+        <item>Vasco</item>
+        <item>Velddrif</item>
+        <item>Velddrift</item>
+        <item>Vembeksbaai</item>
+        <item>Venbekbaai</item>
+        <item>Vermaaklikheid</item>
+        <item>Vermont</item>
+        <item>Vetkoekheuwel</item>
+        <item>Victory Hill</item>
+        <item>Viljoenshof</item>
+        <item>Villiersdorp</item>
+        <item>Vishoek</item>
+        <item>Vissers Hoek</item>
+        <item>Vissershok</item>
+        <item>Vlakteplaas</item>
+        <item>Vleesbaai</item>
+        <item>Vlei River</item>
+        <item>Vleiland</item>
+        <item>Vleirivier</item>
+        <item>Vleisbaai</item>
+        <item>Vleiview</item>
+        <item>Vlermuisklip</item>
+        <item>Vlugt</item>
+        <item>Voëlklip</item>
+        <item>Volmoed</item>
+        <item>Voorbaai</item>
+        <item>Voorbeeld Nedersetting</item>
+        <item>Voorsorg</item>
+        <item>Voorspoed</item>
+        <item>Vredehoek</item>
+        <item>Vredenburg</item>
+        <item>Vredendal</item>
+        <item>Vyeboom</item>
+        <item>Vyekraal</item>
+        <item>Vygeboom</item>
+        <item>Vyversrus</item>
+        <item>Vyversrust</item>
+        <item>Waenhuiskrans</item>
+        <item>Wagenhuiskrantz</item>
+        <item>Warmwaterberg</item>
+        <item>Wattle Park</item>
+        <item>Waverley</item>
+        <item>Waverley Mills</item>
+        <item>Welcome Estate</item>
+        <item>Welgemoed</item>
+        <item>Wellington</item>
+        <item>Weltevrede</item>
+        <item>Weltevreden</item>
+        <item>Weltevreder</item>
+        <item>Welton</item>
+        <item>Werda</item>
+        <item>Wesbank</item>
+        <item>West Point</item>
+        <item>Westford Bridge</item>
+        <item>Westfordbrug</item>
+        <item>Westlake</item>
+        <item>Whitesands</item>
+        <item>Whupperthal</item>
+        <item>Wilderness</item>
+        <item>Wilderness East</item>
+        <item>Wildernis</item>
+        <item>Wildeschutsbrand</item>
+        <item>Wildschutsbrand</item>
+        <item>Wilgerhof</item>
+        <item>Windermere</item>
+        <item>Windmeul</item>
+        <item>Windmill</item>
+        <item>Windsor Park</item>
+        <item>Witewater</item>
+        <item>Witsand</item>
+        <item>Witte Boomen</item>
+        <item>Witte Drift</item>
+        <item>Wittebome</item>
+        <item>Witteboom</item>
+        <item>Wittedrif</item>
+        <item>Wittewater</item>
+        <item>Witwater</item>
+        <item>Wolseley</item>
+        <item>Wolwenkloof</item>
+        <item>Woodlands</item>
+        <item>Woodstock</item>
+        <item>Woodville</item>
+        <item>Worcester</item>
+        <item>Wuppertal</item>
+        <item>Wupperthal</item>
+        <item>Wydgeleë</item>
+        <item>Wydgelegen</item>
+        <item>Wynand's River</item>
+        <item>Wynandsrivier</item>
+        <item>Wynberg</item>
+        <item>Wynberg Hill</item>
+        <item>Wyndover</item>
+        <item>Ysterfontein</item>
+        <item>Ysterplaat</item>
+        <item>Yzerfontein</item>
+        <item>Zand Rivier</item>
+        <item>Zebra</item>
+        <item>Zoar</item>
+        <item>Zonnekus</item>
+        <item>Zonquasdrift</item>
+        <item>Zout Kuil</item>
+        <item>Zoutrivier</item>
+        <item>Zuurbraak</item>
+        <item>Zwart Klip</item>
+        <item>Zweletemba</item>
+    </string-array>
+</resources>

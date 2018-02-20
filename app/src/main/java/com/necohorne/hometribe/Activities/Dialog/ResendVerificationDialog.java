@@ -1,8 +1,10 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Activities.Dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -47,6 +49,9 @@ public class ResendVerificationDialog extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate( R.layout.activity_resend_verification_dialog, container, false);
+
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
+
         setupUI();
 
         return mView;

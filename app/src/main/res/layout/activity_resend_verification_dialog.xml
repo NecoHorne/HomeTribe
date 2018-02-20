@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginRight="15dp"
     android:layout_marginLeft="15dp"
-    android:padding="15dp">
+    android:padding="15dp"
+    android:background="@drawable/alert_dialog_background">
 
     <TextView
         android:id="@+id/resend_textview"
