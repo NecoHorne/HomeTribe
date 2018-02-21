@@ -2,6 +2,8 @@ package com.necohorne.hometribe.Models;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Date;
+
 /**
  * Created by necoh on 2018/02/02.
  * camelCase will not be used in the naming of the fields of this class as it may lead to issues down
@@ -11,11 +13,10 @@ import com.google.android.gms.maps.model.LatLng;
 public class IncidentCrime {
 
     private String incident_type;
-    private String incident_date;
-    private String incident_time;
+    private Date incident_date;
     private String country;
     private String town;
-    private StringBuilder street_address;
+    private String street_address;
     private LatLng incident_location;
     private String incident_description;
     private String police_cas_number;
@@ -35,20 +36,12 @@ public class IncidentCrime {
         this.incident_type = incident_type;
     }
 
-    public String getIncident_date() {
+    public Date getIncident_date() {
         return incident_date;
     }
 
-    public void setIncident_date(String incident_date) {
+    public void setIncident_date(Date incident_date) {
         this.incident_date = incident_date;
-    }
-
-    public String getIncident_time() {
-        return incident_time;
-    }
-
-    public void setIncident_time(String incident_time) {
-        this.incident_time = incident_time;
     }
 
     public String getCountry() {
@@ -67,11 +60,11 @@ public class IncidentCrime {
         this.town = town;
     }
 
-    public StringBuilder getStreet_address() {
+    public String getStreet_address() {
         return street_address;
     }
 
-    public void setStreet_address(StringBuilder street_address) {
+    public void setStreet_address(String street_address) {
         this.street_address = street_address;
     }
 

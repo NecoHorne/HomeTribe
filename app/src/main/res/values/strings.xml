@@ -43,6 +43,8 @@
 
     <!-- Example settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="google_auth_token_android">67743122690-6saahpb265a92vlioup9aor2nde1s84d.apps.googleusercontent.com</string>
+    <string name="google_auth_token_web">67743122690-qsakbsbdit7glcmedh27q2ldquv9fc05.apps.googleusercontent.com</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
@@ -77,6 +79,10 @@
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
+    
+    <!-- Strings for Firebase Data Nodes-->
+    <string name="dbnode_user">users</string>
+    <string name="dbnode_incidents">incidents</string>
 
     <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>

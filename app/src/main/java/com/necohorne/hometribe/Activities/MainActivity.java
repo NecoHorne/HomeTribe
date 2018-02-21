@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity
 
     //------------LOGIN OBJECTS------------//
     private static AccessToken mAccessToken;
+    private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInAccount mAccount;
     private GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity
 
         //login
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mAuth = FirebaseAuth.getInstance();
         updateUserProfile();
 
         //options Menu Setup
@@ -242,12 +244,6 @@ public class MainActivity extends AppCompatActivity
 
     //------------USER / PROFILE / LOGIN------------//
     private void logOut() {
-        facebookLogOut();
-        googleLogOut();
-        firebaseLogOut();
-    }
-
-    private void firebaseLogOut() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null){
             FirebaseAuth.getInstance().signOut();
@@ -255,35 +251,6 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
     }
-
-    private void googleLogOut(){
-
-        mAccount = GoogleSignIn.getLastSignedInAccount(this);
-
-        if (mAccount != null) {
-            mGoogleSignInClient.signOut().addOnCompleteListener( this, new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    startActivity(mLogOutIntent);
-                    finish();
-                }
-            } );
-        }else {
-            //already signed out.
-        }
-    }
-
-    private void facebookLogOut(){
-            if (mAccessToken != null){
-                return;
-                //already Logged out
-            }else {
-                LoginManager.getInstance().logOut();
-                Toast.makeText( MainActivity.this, "Logged Out", Toast.LENGTH_LONG ).show();
-            }
-            startActivity(new Intent( mLogOutIntent));
-            finish();
-        }
 
     private void updateUserProfile(){
 
@@ -312,7 +279,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "checkAuthenticationState: checking authentication state.");
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null && mAccessToken != null && mAccount == null){
+        if (user == null){
             Log.d(TAG, "checkAuthenticationState: user is not Authenticated, Navigating back to Login Activity");
             mLogOutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity( mLogOutIntent);

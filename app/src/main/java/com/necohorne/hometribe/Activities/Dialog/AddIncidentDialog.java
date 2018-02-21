@@ -23,10 +23,13 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
 import com.necohorne.hometribe.Models.IncidentCrime;
 import com.necohorne.hometribe.R;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -41,6 +44,8 @@ public class AddIncidentDialog extends DialogFragment{
 
     private Spinner mIncidentSpinner;
     private Spinner mProvinceSpinner;
+    private Spinner mHourSpinner;
+    private Spinner mMinuteSpinner;
     private EditText mDay;
     private EditText mMonth;
     private EditText mYear;
@@ -60,12 +65,20 @@ public class AddIncidentDialog extends DialogFragment{
     private String mSpecifiedIncident;
     private LatLng mLocation;
     private IncidentCrime mIncident;
+    private FirebaseUser mUser;
+    private FirebaseAuth mAuth;
+    private String mHours;
+    private String mMinutes;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_add_incident_dialog , container, false);
         mContext = getActivity();
+
+        mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        Log.d( TAG, "incident User " + user.getUid() );
 
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
 
@@ -78,15 +91,16 @@ public class AddIncidentDialog extends DialogFragment{
 
         mIncidentSpinner = (Spinner) mView.findViewById( R.id.report_incident_spinner );
         incidentSpinnerUI();
-
         mProvinceSpinner = (Spinner) mView.findViewById( R.id.incident_province_spinner);
         provinceSpinnerUI();
+        mHourSpinner = (Spinner) mView.findViewById(R.id.hour_spinner);
+        hourSpinnerUI();
+        mMinuteSpinner = (Spinner) mView.findViewById(R.id.minutes_spinner);
+        minuteSpinnerUi();
 
         mDay = (EditText) mView.findViewById(R.id.report_incident_day);
         mMonth = (EditText) mView.findViewById(R.id.report_incident_month);
         mYear = (EditText) mView.findViewById(R.id.report_incident_year);
-
-        mTime = (EditText) mView.findViewById(R.id.report_incident_time);
 
         mStreetNum = (EditText) mView.findViewById(R.id.report_incident_street_num);
         mStreetName = (EditText) mView.findViewById(R.id.incident_report_street_name);
@@ -101,13 +115,11 @@ public class AddIncidentDialog extends DialogFragment{
 
                 setupIncidentObject();
 
-                if (setupIncidentObject() != null){
-                    uploadIncidentToFirebaseDB(mIncident);
-                    Toast.makeText( mContext, "Incident Reported", Toast.LENGTH_SHORT ).show();
-                    getDialog().dismiss();
+                Toast.makeText( mContext, "Incident Reported", Toast.LENGTH_SHORT ).show();
+                getDialog().dismiss();
                 }
             }
-        } );
+         );
     }
 
     private void incidentSpinnerUI(){
@@ -141,6 +153,42 @@ public class AddIncidentDialog extends DialogFragment{
 
             }
         } );
+    }
+
+    private void hourSpinnerUI(){
+        ArrayAdapter<CharSequence> hourSpinnerAdapter = ArrayAdapter.createFromResource( mContext, R.array.hours, R.layout.spinner_item);
+        hourSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_item);
+        mHourSpinner.setAdapter( hourSpinnerAdapter);
+        mHourSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mHours = mHourSpinner.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        } );
+
+    }
+
+    private void minuteSpinnerUi(){
+        ArrayAdapter<CharSequence> minSpinnerAdapter = ArrayAdapter.createFromResource( mContext, R.array.minutes, R.layout.spinner_item);
+        minSpinnerAdapter.setDropDownViewResource( android.R.layout.simple_spinner_item);
+        mMinuteSpinner.setAdapter( minSpinnerAdapter);
+        mMinuteSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mMinutes = mMinuteSpinner.getSelectedItem().toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        } );
+
     }
 
     private void townByProvinceSetup(){
@@ -212,13 +260,13 @@ public class AddIncidentDialog extends DialogFragment{
         }
     }
 
-    @Nullable
-    private IncidentCrime setupIncidentObject() {
+    private void setupIncidentObject() {
 
         if (!isEmpty(mDay.getText().toString()
         )       || !isEmpty(mMonth.getText().toString())
                 || !isEmpty(mYear.getText().toString())
-                || !isEmpty(mTime.getText().toString())
+                || !mHours.equals("Hour")
+                || !mMinutes.equals("Minutes")
                 || !isEmpty(mStreetNum.getText().toString())
                 || !isEmpty(mStreetName.getText().toString())
                 || !isEmpty(mCity.getText().toString())
@@ -227,14 +275,18 @@ public class AddIncidentDialog extends DialogFragment{
             //IncidentCrime Type
             mIncident = new IncidentCrime( mSpecifiedIncident );
 
-            //IncidentCrime Date
-            //TODO
-
-            //IncidentCrime Time
-            //TODO
+            //IncidentCrime Date and time
+            int year = Integer.parseInt(mYear.getText().toString());
+            int month = Integer.parseInt(mMonth.getText().toString());
+            int day = Integer.parseInt(mDay.getText().toString());
+            int hour = Integer.parseInt(mHours);
+            int minute = Integer.parseInt(mMinutes);
+            Date date = getDate( year, month, day, hour, minute);
+            mIncident.setIncident_date( date);
 
             //IncidentCrime Country
-            mIncident.setCountry( Locale.getDefault().getCountry() );
+            String locale = mContext.getResources().getConfiguration().locale.getDisplayCountry();
+            mIncident.setCountry(locale);
 
             //IncidentCrime Town
             mIncident.setTown( mCity.getText().toString());
@@ -244,18 +296,21 @@ public class AddIncidentDialog extends DialogFragment{
             sbStreetAddress.append(mStreetNum.getText().toString());
             sbStreetAddress.append(" ");
             sbStreetAddress.append(mStreetName.getText().toString());
-            mIncident.setStreet_address(sbStreetAddress);
+            String streetAddress = sbStreetAddress.toString();
+            mIncident.setStreet_address(streetAddress);
 
             //IncidentCrime Location
             try {
                 List<Address> result = new Geocoder( mContext, Locale.getDefault() ).getFromLocationName( sbStreetAddress.toString(), 1 );
-                Address address = result.get( 0 );
-                mLocation = new LatLng( address.getLatitude(), address.getLongitude() );
-                Log.d( TAG, "address: " + mLocation.toString() );
+                if (result.get(0) != null){
+                    Address address = result.get(0);
+                    mLocation = new LatLng(address.getLatitude(), address.getLongitude());
+                    Log.d( TAG, "address: " + mLocation.toString() );
+                    mIncident.setIncident_location(mLocation);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mIncident.setIncident_location(mLocation);
 
             //IncidentCrime Description
             mIncident.setIncident_description(mDescription.getText().toString());
@@ -268,19 +323,32 @@ public class AddIncidentDialog extends DialogFragment{
             }
 
             //IncidentCrime Reported By
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            Log.d(TAG, "incident reported by: " + user.getUid().toString() );
-            mIncident.setReported_by(user.getUid());
+            mUser = mAuth.getCurrentUser();
+            Log.d(TAG, "incident reported by: " + mUser.getUid().toString() );
+            mIncident.setReported_by(mUser.getUid());
 
-            return mIncident;
+            uploadIncidentToFirebaseDB(mIncident);
 
         } else {
             Toast.makeText( mContext, "All fields except Police CAS number are Mandatory", Toast.LENGTH_SHORT ).show();
-            return null;
         }
     }
 
-    private void uploadIncidentToFirebaseDB(IncidentCrime incident) {
+    private Date getDate(int year, int month, int day, int hour, int minutes){
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.MONTH, month);
+        cal.set(Calendar.DAY_OF_MONTH, day);
+        cal.set(Calendar.HOUR_OF_DAY, hour);
+        cal.set(Calendar.MINUTE, minutes);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
 
+    private void uploadIncidentToFirebaseDB(IncidentCrime incident) {
+        FirebaseDatabase.getInstance().getReference()
+                .child(getString(R.string.dbnode_incidents))
+                .setValue(incident);
     }
 }
