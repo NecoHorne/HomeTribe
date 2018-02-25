@@ -50,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/incident_report_street_name" />
+        app:layout_constraintTop_toBottomOf="@+id/incident_place_autocomplete_fragment" />
 
     <EditText
         android:id="@+id/report_incident_cas_number"
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Police CAS Number"
         android:inputType="text"
@@ -80,6 +80,19 @@
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <fragment
+        android:id="@+id/incident_place_autocomplete_fragment"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/incident_province_spinner" />
+
     <Button
         android:id="@+id/report_incident_submit_button"
         android:layout_width="wrap_content"
@@ -96,57 +109,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/report_incident_cas_number" />
-
-    <AutoCompleteTextView
-        android:id="@+id/report_incident_town"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="City / Town"
-        android:textColor="@color/White"
-        android:textColorHint="@color/White"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/incident_province_spinner" />
-
-    <EditText
-        android:id="@+id/report_incident_street_num"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Street #"
-        android:inputType="number"
-        android:textColor="@color/White"
-        android:textColorHint="@color/White"
-        app:layout_constraintBottom_toTopOf="@+id/report_incident_description"
-        app:layout_constraintEnd_toStartOf="@+id/incident_report_street_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_town"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <EditText
-        android:id="@+id/incident_report_street_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Street Name"
-        android:inputType="text"
-        android:textColor="@color/White"
-        android:textColorHint="@color/White"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/report_incident_street_num"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_town" />
 
     <Spinner
         android:id="@+id/incident_province_spinner"

@@ -136,14 +136,17 @@ public class LoginActivity extends AppCompatActivity {
 
                     if (mUser.isEmailVerified()) {
                         Log.d( TAG, "onAuthStateChanged: signed in" + mUser.getUid() );
+                        Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
                     } else if (provider.equals( "[facebook.com]" )) {
                         Log.d( TAG, "onAuthStateChanged: Facebook signed in" + mUser.getUid() );
+                        Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
                     }else if (provider.equals( "[google.com]" )){
                         Log.d( TAG, "onAuthStateChanged: Google signed in" + mUser.getUid() );
+                        Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
                     }else {
@@ -271,6 +274,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
+        mAuth = FirebaseAuth.getInstance();
         Log.d(TAG, "handleFacebookAccessToken:" + token);
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

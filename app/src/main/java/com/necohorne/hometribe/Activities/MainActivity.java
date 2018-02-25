@@ -1,8 +1,18 @@
 package com.necohorne.hometribe.Activities;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -26,35 +36,57 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.Profile;
-import com.facebook.login.LoginManager;
-import com.facebook.login.widget.ProfilePictureView;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
+import com.necohorne.hometribe.Activities.Dialog.HomePromptSetup;
+import com.necohorne.hometribe.Constants.Constants;
+import com.necohorne.hometribe.Models.Home;
+import com.necohorne.hometribe.Models.IncidentCrime;
 import com.necohorne.hometribe.R;
 
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
+import static com.necohorne.hometribe.Constants.Constants.DISTANCE;
+import static com.necohorne.hometribe.Constants.Constants.FIVE_KILOMETERS;
+import static com.necohorne.hometribe.Constants.Constants.ONE_MONTH;
+import static com.necohorne.hometribe.Constants.Constants.PREFS_DISTANCE;
+import static com.necohorne.hometribe.Constants.Constants.PREFS_TIME;
+import static com.necohorne.hometribe.Constants.Constants.TIME;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
@@ -62,23 +94,39 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private Intent mLogOutIntent;
 
+    //------------SHARED PREFS------------//
+    private SharedPreferences mHomePrefs;
+    private SharedPreferences distanceSharedPrefs;
+    private SharedPreferences timeSharedPrefs;
+    boolean prefBool;
+    private String mDistancePref;
+    private String mTimePref;
+
     //------------LOCATION OBJECTS------------//
     private GoogleMap mMap;
     private LocationManager locationManager;
     private LocationListener locationListener;
     private LatLng mCurrentLocation;
 
-    //------------LOGIN OBJECTS------------//
-    private static AccessToken mAccessToken;
+    //------------LOGIN / AUTH OBJECTS------------//
     private FirebaseAuth mAuth;
-    private GoogleSignInClient mGoogleSignInClient;
-    private GoogleSignInAccount mAccount;
-    private GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
 
     //------------USER PROFILE------------//
-    private ProfilePictureView profilePicture;
+    private ImageView profilePicture;
     private TextView userName;
-    private static Profile fbProfile;
+    private FirebaseUser mUser;
+    private String mUid;
+    private String mName;
+    private String mEmail;
+    private Uri mPhotoUrl;
+    private LatLng mHomeLatLng;
+    private ArrayList<IncidentCrime> mCrimeArrayList;
+
+    //------------DATABASE OBJECTS------------//
+    private DatabaseReference mDatabaseReference;
+
+    private Date mToday;
+    private AddIncidentDialog mIncidentdialog;
 
     //------------BOTTOM MENU BAR------------//
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -93,18 +141,18 @@ public class MainActivity extends AppCompatActivity
 //                     open chat window drawer
                     return true;
                 case R.id.bottom_nav_incident:
-                    AddIncidentDialog dialog = new AddIncidentDialog();
-                    dialog.show( getFragmentManager(), "activity_add_incident_dialog" );
+
+                    if (mIncidentdialog != null){
+                        mIncidentdialog = null;
+                    }
+                    mIncidentdialog = new AddIncidentDialog();
+                    mIncidentdialog.show(getFragmentManager(), "activity_add_incident_dialog");
                     return true;
             }
             return false;
         }
     };
 
-    static {
-        mAccessToken.getCurrentAccessToken();
-        fbProfile = Profile.getCurrentProfile();
-    }
 
     //------------ACTIVITY LIFECYCLE------------//
     @Override
@@ -116,7 +164,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar( toolbar );
 
         //login
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         mAuth = FirebaseAuth.getInstance();
         updateUserProfile();
 
@@ -145,12 +192,31 @@ public class MainActivity extends AppCompatActivity
             }
         } );
 
+        //Shared Preferences
+        getPrefs();
+        homePromptDialog();
+        today();
+
+
         //Maps
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapView);
         mapFragment.getMapAsync( MainActivity.this );
 
-        mLogOutIntent = new Intent(MainActivity.this, LoginActivity.class);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                getIncidentLocations();
+            }
 
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mDatabaseReference.addValueEventListener(postListener);
+
+        mLogOutIntent = new Intent(MainActivity.this, LoginActivity.class);
 
     }
 
@@ -159,6 +225,14 @@ public class MainActivity extends AppCompatActivity
         updateUserProfile();
         checkAuthenticationState();
         super.onResume();
+    }
+
+    @Override
+    protected void onRestart() {
+        homePromptDialog();
+        getPrefs();
+        homeLocation();
+        super.onRestart();
     }
 
     @Override
@@ -197,6 +271,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent( this, SettingsActivity.class ));
                 break;
+            case  R.id.incident_settings:
+                startActivity( new Intent( this, IncidentSettingsActivity.class));
+                break;
             case R.id.menu_log_out:
                 logOut();
                 break;
@@ -208,7 +285,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void settingsPrefsSetUp(){
-
         PreferenceManager.setDefaultValues(this,R.xml.pref_general,false);
         PreferenceManager.setDefaultValues(this,R.xml.pref_notification,false);
         PreferenceManager.setDefaultValues(this,R.xml.pref_data_sync,false);
@@ -221,10 +297,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_home:
-                //
-                break;
-            case R.id.nav_chat:
-                //
+                Intent homeIntent = new Intent( MainActivity.this, HomeActivity.class);
+                startActivity(homeIntent);
                 break;
             case R.id.nav_friends:
                 //
@@ -235,6 +309,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_send:
                 //
                 break;
+            case R.id.test_features:
+                //
+                break;
             //add more nav menu items
         }
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
@@ -242,37 +319,80 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    //------------USER / PROFILE / LOGIN------------//
+    public void getPrefs(){
+        mHomePrefs = getSharedPreferences(Constants.PREFS_HOME, 0);
+        prefBool = mHomePrefs.contains(Constants.HOME);
+        distanceSharedPrefs = getSharedPreferences(PREFS_DISTANCE, 0);
+        timeSharedPrefs = getSharedPreferences(PREFS_TIME, 0);
+        mDistancePref = distanceSharedPrefs.getString(DISTANCE, FIVE_KILOMETERS);
+        mTimePref = timeSharedPrefs.getString(TIME, ONE_MONTH);
+
+        mHomePrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                getIncidentLocations();
+            }
+        } );
+        distanceSharedPrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                getIncidentLocations();
+            }
+        } );
+        timeSharedPrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                getIncidentLocations();
+            }
+        } );
+    }
+
+    //------------PROFILE / LOGIN------------//
     private void logOut() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null){
             FirebaseAuth.getInstance().signOut();
-            startActivity( mLogOutIntent);
+            Toast.makeText( MainActivity.this, "Successfully logged out", Toast.LENGTH_LONG).show();
+            startActivity(mLogOutIntent);
             finish();
         }
     }
 
     private void updateUserProfile(){
 
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-
         NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
         View headerView = navigationView.getHeaderView(0);
-        profilePicture = (ProfilePictureView) headerView.findViewById( R.id.nav_profile_image );
+        profilePicture = (ImageView) headerView.findViewById( R.id.nav_profile_image );
         userName = (TextView) headerView.findViewById( R.id.nav_profile_name );
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        String provider = mUser.getProviders().toString();
 
-        if (fbProfile != null) {
-            try {
-                userName.setText( fbProfile.getFirstName() + " " + fbProfile.getLastName());
-                profilePicture.setProfileId(fbProfile.getId());
-            }catch (Exception e){
-                Log.d("Facebook Profile Error", "error getting facebook profile data");
-            }
+        if (mUser != null){
+            if (provider.equals("[firebase.com]")) {
+                mUid = mUser.getUid();
+                mName = mUser.getDisplayName();
+                mEmail = mUser.getEmail();
+                mPhotoUrl = mUser.getPhotoUrl();
+            }else if (provider.equals( "[facebook.com]" )) {
+                for (UserInfo profile : mUser.getProviderData()) {
+                    String providerId = profile.getProviderId();
+                    mUid = profile.getUid();
+                    mName = profile.getDisplayName();
+                    mEmail = profile.getEmail();
+                    mPhotoUrl = profile.getPhotoUrl();
+                }
+            }else if (provider.equals( "[google.com]" )){
+                for (UserInfo profile : mUser.getProviderData()) {
+                    String providerId = profile.getProviderId();
+                    mUid = profile.getUid();
+                    mName = profile.getDisplayName();
+                    mEmail = profile.getEmail();
+                    mPhotoUrl = profile.getPhotoUrl();
+                }
         }
-
-        //Firebase
-        getFirebaseUserDetails();
-        setFirebaseUserDetails();
+        profilePicture.setImageURI(mPhotoUrl);
+        userName.setText(mName);
+        }
     }
 
     private void checkAuthenticationState(){
@@ -286,16 +406,6 @@ public class MainActivity extends AppCompatActivity
             finish();
         }else {
             Log.d(TAG, "checkAuthenticationState: user is Authenticated");
-        }
-    }
-
-    private void getFirebaseUserDetails(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user!= null){
-            String uid = user.getUid();
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            Uri photoUrl = user.getPhotoUrl();
         }
     }
 
@@ -321,12 +431,20 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void homePromptDialog(){
+        if (!prefBool){
+            HomePromptSetup dialog = new HomePromptSetup();
+            dialog.show(getFragmentManager(),"fragment_home_prompt");
+        }
+    }
+
     //------------MAPS------------//
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         setUpLocation();
+        getIncidentLocations();
     }
 
     private void setUpLocation() {
@@ -336,25 +454,20 @@ public class MainActivity extends AppCompatActivity
         locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d( "location ", location.toString() );
-                mMap.clear();
                 mCurrentLocation = new LatLng( location.getLatitude(), location.getLongitude());
-                currentLocation( mCurrentLocation);
+                homeLocation();
             }
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
-
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-
             }
 
             @Override
             public void onProviderDisabled(String provider) {
-
             }
         };
 
@@ -372,10 +485,14 @@ public class MainActivity extends AppCompatActivity
 
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-            List<Address> addressList = geocoder.getFromLocation( currentLocation.latitude, currentLocation.longitude, 1 );
+            List<Address> addressList = geocoder.getFromLocation(currentLocation.latitude, currentLocation.longitude, 1);
 
-            mMap.addMarker( new MarkerOptions().position( currentLocation ).title( addressList.get(0).getAddressLine(0)));
-            mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( currentLocation, 13) );
+            Bitmap homeMarker = getBitmap(R.drawable.ic_loc_user_3);
+            Bitmap resizedBitmap = Bitmap.createScaledBitmap(homeMarker, 115, 115, false );
+            MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+
+            mMap.addMarker(markerOptions.position(currentLocation).title(addressList.get(0).getAddressLine(0)));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 15));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -383,7 +500,37 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void homeLocation(){
-        //TODO
+        if (prefBool){
+            Gson gson = new Gson();
+            String json = mHomePrefs.getString(Constants.HOME, "" );
+            Home home = gson.fromJson(json, Home.class);
+            if (home.getLocation() != null){
+                mHomeLatLng = home.getLocation();
+                Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                try {
+                    List<Address> addressList = geocoder.getFromLocation(mHomeLatLng.latitude, mHomeLatLng.longitude, 1);
+                    Bitmap homeMarker = getBitmap(R.drawable.ic_loc_icon_home);
+                    Bitmap resizedBitmap = Bitmap.createScaledBitmap(homeMarker, 115, 115, false);
+                    MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+//                    mMap.clear();
+                    mMap.addMarker(markerOptions.position(mHomeLatLng).title("My Home"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 14));
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private Bitmap getBitmap(int drawableRes) {
+        Drawable drawable = getResources().getDrawable(drawableRes);
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     @Override
@@ -406,4 +553,121 @@ public class MainActivity extends AppCompatActivity
     public void onPointerCaptureChanged(boolean hasCapture) {
     }
 
+    //------------FIREBASE DATABASE------------//
+    public void getIncidentLocations(){
+        mCrimeArrayList = new ArrayList<>();
+        if (mCrimeArrayList.size() > 0){
+            mCrimeArrayList.clear();
+        }
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        Query query = mDatabaseReference.child(getString(R.string.dbnode_incidents));
+        mMap.clear();
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()){
+                    Log.d( TAG, "onDataChange: found Incidents" + singleSnapshot.getValue());
+                    IncidentCrime incident = new IncidentCrime();
+                    Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
+
+                    incident.setIncident_type(objectMap.get(getString(R.string.field_incident_type)).toString());
+
+                    String date = objectMap.get(getString( R.string.field_incident_date)).toString();
+                    incident.setIncident_date(date);
+
+                    incident.setCountry(objectMap.get(getString(R.string.field_incident_type)).toString());
+                    incident.setState_province(objectMap.get(getString(R.string.field_state_province)).toString());
+                    incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
+                    incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
+
+                    String sLocation = (objectMap.get(getString(R.string.field_incident_location)).toString());
+                    incident.setIncident_location(getLocation(sLocation));
+
+                    incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
+                    incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
+                    incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
+
+                    setUpIncidentMarkers(incident);
+                }
+                homeLocation();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText( MainActivity.this, "Database Error, please try again later", Toast.LENGTH_SHORT ).show();
+            }
+        } );
+    }
+
+    private LatLng getLocation(String location){
+
+        String regex = "\\blongitude=\\b";
+        String str1 = location.replaceAll( "[{]", "" );
+        String str2 = str1.substring(9);
+        String str3 = str2.replaceAll( "[}]", "" );
+        String str4 = str3.replaceAll( regex, "" );
+        String[] latlong =  str4.split(",");
+
+        double latitude = Double.parseDouble(latlong[0]);
+        double longitude = Double.parseDouble(latlong[1]);
+        LatLng latLng = new LatLng(latitude, longitude);
+
+        return latLng;
+    }
+
+    private void setUpIncidentMarkers(IncidentCrime incident) {
+
+        double distanceFromHome = checkDistance(incident) * 1000;
+        today();
+        if (incident.getIncident_location() != null){
+            if (incident.getIncident_date() != null){
+                long days = getDateDiff(convertDate(incident).getTime(), mToday, TimeUnit.DAYS);
+                Log.d( TAG, "Time Prefs: " + mTimePref );
+                if (days <= Integer.parseInt(mTimePref)){
+                    LatLng location = incident.getIncident_location();
+                    Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                    try {
+                        List<Address> addressList = geocoder.getFromLocation(location.latitude, location.longitude, 1);
+                        Bitmap homeMarker = getBitmap(R.drawable.ic_loc_icon_red);
+                        Bitmap resizedBitmap = Bitmap.createScaledBitmap(homeMarker, 115, 115, false);
+                        MarkerOptions markerOptions = new MarkerOptions().icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
+                        mMap.addMarker(markerOptions.position(location).title(incident.getIncident_type()));
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private double checkDistance(IncidentCrime incident) {
+        double distance = 0;
+        if (incident.getIncident_location() != null & mHomeLatLng != null){
+            distance = computeDistanceBetween(incident.getIncident_location(), mHomeLatLng);
+        }
+        return distance;
+    }
+
+    private Calendar convertDate(IncidentCrime incident) {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+        try {
+            cal.setTime(sdf.parse(incident.getIncident_date()));
+            Log.d( TAG, "set date to calander success");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.d( TAG, "onDataChange: Date" + incident.getIncident_date() );
+
+        return cal;
+    }
+
+    public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
+        long diffInMillies = date2.getTime() - date1.getTime();
+        return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    }
+
+    public void today(){
+        Calendar calendar = Calendar.getInstance();
+            mToday = calendar.getTime();
+    }
 }

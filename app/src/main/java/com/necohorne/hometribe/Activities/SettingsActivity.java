@@ -71,11 +71,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                     if (ringtone == null) {
                         // Clear the summary if there was a lookup error.
-                        preference.setSummary( null );
+                        preference.setSummary(null);
                     } else {
                         // Set the summary to reflect the new ringtone display
                         // name.
-                        String name = ringtone.getTitle( preference.getContext() );
+                        String name = ringtone.getTitle(preference.getContext() );
                         preference.setSummary( name );
                     }
                 }

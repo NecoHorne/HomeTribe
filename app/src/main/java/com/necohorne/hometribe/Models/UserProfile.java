@@ -16,14 +16,15 @@ public class UserProfile {
     private String phone_number;
     private String profile_image;
     private String user_id;
-    private LatLng home_location;
+    private Home home_location;
     private LatLng user_current_location;
 
     //------------CONSTRUCTORS------------//
-    public UserProfile() {
+    public UserProfile(String user_id) {
+        this.user_id = user_id;
     }
 
-    public UserProfile(String user_name, String user_last_name, String user_email, String phone_number, String profile_image, String user_id, LatLng home_location, LatLng user_current_location) {
+    public UserProfile(String user_name, String user_last_name, String user_email, String phone_number, String profile_image, String user_id, Home home_location, LatLng user_current_location) {
         this.user_name = user_name;
         this.user_last_name = user_last_name;
         this.user_email = user_email;
@@ -83,11 +84,11 @@ public class UserProfile {
         this.user_id = user_id;
     }
 
-    public LatLng getHome_location() {
+    public Home getHome_location() {
         return home_location;
     }
 
-    public void setHome_location(LatLng home_location) {
+    public void setHome_location(Home home_location) {
         this.home_location = home_location;
     }
 

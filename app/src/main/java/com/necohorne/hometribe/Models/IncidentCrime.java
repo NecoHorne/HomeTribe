@@ -13,8 +13,9 @@ import java.util.Date;
 public class IncidentCrime {
 
     private String incident_type;
-    private Date incident_date;
+    private String incident_date;
     private String country;
+    private String state_province;
     private String town;
     private String street_address;
     private LatLng incident_location;
@@ -23,6 +24,9 @@ public class IncidentCrime {
     private String reported_by;
 
     //------------CONSTRUCTORS------------//
+    public IncidentCrime() {
+    }
+
     public IncidentCrime(String incident_type) {
         this.incident_type = incident_type;
     }
@@ -36,11 +40,11 @@ public class IncidentCrime {
         this.incident_type = incident_type;
     }
 
-    public Date getIncident_date() {
+    public String getIncident_date() {
         return incident_date;
     }
 
-    public void setIncident_date(Date incident_date) {
+    public void setIncident_date(String incident_date) {
         this.incident_date = incident_date;
     }
 
@@ -50,6 +54,14 @@ public class IncidentCrime {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getState_province() {
+        return state_province;
+    }
+
+    public void setState_province(String state_province) {
+        this.state_province = state_province;
     }
 
     public String getTown() {

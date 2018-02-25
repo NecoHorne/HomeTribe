@@ -45,6 +45,7 @@
     <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="google_auth_token_android">67743122690-6saahpb265a92vlioup9aor2nde1s84d.apps.googleusercontent.com</string>
     <string name="google_auth_token_web">67743122690-qsakbsbdit7glcmedh27q2ldquv9fc05.apps.googleusercontent.com</string>
+    <string name="google_maps_places_api_key">AIzaSyB-ASeUI3wmqvW3s8VeBLSF0GVschxantU</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
@@ -79,10 +80,23 @@
     <string-array name="multi_select_list_preference_default_value" />
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
-    
+
     <!-- Strings for Firebase Data Nodes-->
     <string name="dbnode_user">users</string>
     <string name="dbnode_incidents">incidents</string>
+
+    <!-- Strings for Incidents-->
+    <string name="field_incident_type">incident_type</string>
+    <string name="field_incident_date">incident_date</string>
+    <string name="field_country">country</string>
+    <string name="field_state_province">state_province</string>
+    <string name="field_town">town</string>
+    <string name="field_street_address">street_address</string>
+    <string name="field_incident_location">incident_location</string>
+    <string name="field_incident_description">incident_description</string>
+    <string name="field_police_cas_number">police_cas_number</string>
+    <string name="field_reported_by">reported_by</string>
+
 
     <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
@@ -99,4 +113,15 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="resend_verification_email">Resend Verification Email</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="alert">Alert</string>
+    <string name="alert_home_prompt">Please note you have not yet set your Home Location. Home Tribe needs this location to load up incidents around your home. Don\'t worry as this information will not be shared or be visable to anybody but you.</string>
+    <string name="incidents_5k_title">Show incidents within a 5Km radius of Home</string>
+    <string name="incidents_10k_title">Show incidents within a 10Km radius of Home</string>
+    <string name="incidents_15k_title">Show incidents within a 15Km radius of Home</string>
+    <string name="incidents_week_title">Show Incidents within the last week</string>
+    <string name="incidents_month_title">Show Incidents within the last month</string>
+    <string name="incidents_3month_title">Show Incidents within the last 3 months</string>
 </resources>
