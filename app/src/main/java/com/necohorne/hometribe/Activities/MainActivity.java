@@ -143,6 +143,8 @@ public class MainActivity extends AppCompatActivity
                 case R.id.bottom_nav_incident:
 
                     if (mIncidentdialog != null){
+                        mIncidentdialog.setInitialSavedState(null);
+//                        mIncidentdialog.isStateSaved();
                         mIncidentdialog = null;
                     }
                     mIncidentdialog = new AddIncidentDialog();

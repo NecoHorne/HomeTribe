@@ -2,6 +2,8 @@ package com.necohorne.hometribe.Activities.Dialog;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -83,22 +85,12 @@ public class AddIncidentDialog extends DialogFragment{
     private Object mIncidentdialog;
     private PlaceAutocompleteFragment mAutocompleteFragment;
 
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        mView = null;
-        super.onCreate( savedInstanceState );
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        mView = null;
-        mAutocompleteFragment = null;
             try {
                 mView = inflater.inflate(R.layout.activity_add_incident_dialog , container, false);
             } catch (InflateException e) {
-                getDialog().show();
                 return mView;
             }
 
@@ -111,6 +103,15 @@ public class AddIncidentDialog extends DialogFragment{
         getAddress();
         setupDataBase();
         return mView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        Fragment mf = mAutocompleteFragment.getFragmentManager().findFragmentById( R.id.incident_place_autocomplete_fragment  );
+        if (mf != null)
+            getFragmentManager().beginTransaction().remove(mf).commit();
     }
 
     private void setupUi() {
