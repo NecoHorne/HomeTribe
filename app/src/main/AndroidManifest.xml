@@ -67,7 +67,6 @@
 
         <activity android:name=".Activities.HomeActivity" />
         <activity android:name=".Activities.UserProfileActivity" />
-        <activity android:name=".Activities.Dialog.CustomInfoWindow"></activity>
     </application>
 
 </manifest>

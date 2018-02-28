@@ -3,3 +3,5 @@ package com.necohorne.hometribe
 This is my first "solo" Android Project, This is a user generated crime reporting app, reported incidents
 will appear within a set radius of the users Home location. the Entire project is Firebase integrated, backend is all Firebase.
 Work in progress.
+
+note that the strings.xml, googlemapsapi and google services.json has been .gitignore, do not try to run this project.
