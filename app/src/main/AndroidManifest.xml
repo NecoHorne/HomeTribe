@@ -65,8 +65,9 @@
             android:name="io.fabric.ApiKey"
             android:value="639de560ac89f43146f7e02b39ea1fde04281360" />
 
-        <activity android:name=".Activities.IncidentSettingsActivity" />
-        <activity android:name=".Activities.HomeActivity"></activity>
+        <activity android:name=".Activities.HomeActivity" />
+        <activity android:name=".Activities.UserProfileActivity" />
+        <activity android:name=".Activities.Dialog.CustomInfoWindow"></activity>
     </application>
 
 </manifest>

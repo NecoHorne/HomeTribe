@@ -1,18 +1,14 @@
 package com.necohorne.hometribe.Activities.Dialog;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
@@ -20,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -33,25 +28,20 @@ import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.necohorne.hometribe.Activities.MainActivity;
 import com.necohorne.hometribe.Models.IncidentCrime;
 import com.necohorne.hometribe.R;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.Inflater;
 
 import static android.text.TextUtils.isEmpty;
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -59,13 +49,9 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 public class AddIncidentDialog extends DialogFragment{
 
     private static final String TAG = "Incident Dialog ";
-
     private Context mContext;
     private View mView;
-
     private DatabaseReference mDatabase;
-    private StorageReference mStorageRef;
-
     private Spinner mIncidentSpinner;
     private Spinner mProvinceSpinner;
     private Spinner mHourSpinner;
@@ -77,12 +63,10 @@ public class AddIncidentDialog extends DialogFragment{
     private String mMinutes;
     private EditText mDescription;
     private EditText mPoliceNumber;
-
     private String mChosenProvince;
     private String mSpecifiedIncident;
     private FirebaseAuth mAuth;
     private Place incidentPlace;
-    private Object mIncidentdialog;
     private PlaceAutocompleteFragment mAutocompleteFragment;
 
     @Override
@@ -151,6 +135,7 @@ public class AddIncidentDialog extends DialogFragment{
 
         mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById( R.id.incident_place_autocomplete_fragment );
+        mAutocompleteFragment.setHint("Incident Location");
 
         mAutocompleteFragment.setOnPlaceSelectedListener( new PlaceSelectionListener() {
             @Override
@@ -170,8 +155,6 @@ public class AddIncidentDialog extends DialogFragment{
     private void setupDataBase(){
         mDatabase =  FirebaseDatabase.getInstance().getReference()
                 .child(getString(R.string.dbnode_incidents));
-
-        mStorageRef = FirebaseStorage.getInstance().getReference();
     }
 
     private void incidentSpinnerUI(){
@@ -251,7 +234,8 @@ public class AddIncidentDialog extends DialogFragment{
                 || !mHours.equals("Hour")
                 || !mMinutes.equals("Minutes")
                 || incidentPlace == null
-                || !isEmpty(mDescription.getText().toString())) {
+                || !isEmpty(mDescription.getText().toString())
+                || !mDescription.getText().toString().equals("")) {
 
             //IncidentCrime Type
             IncidentCrime incident = new IncidentCrime( mSpecifiedIncident );

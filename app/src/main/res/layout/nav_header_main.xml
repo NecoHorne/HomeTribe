@@ -17,8 +17,8 @@
         android:layout_width="111dp"
         android:layout_height="113dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:background="@mipmap/ic_launcher_round"
-        android:paddingTop="@dimen/nav_header_vertical_spacing" />
+        android:background="@drawable/image_round_drawable"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"/>
 
     <TextView
         android:id="@+id/nav_profile_name"
@@ -27,6 +27,8 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/user_name"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
 </LinearLayout>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <RelativeLayout
+                android:id="@+id/relativePopId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="25dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/pop_incident_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:text="incident type"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/pop_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/pop_incident_type"
+                    android:padding="5dp"
+                    android:text="Km from Home"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/popList"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/pop_distance"
+                    android:padding="5dp"
+                    android:text="Date"
+                    android:textSize="15sp" />
+
+
+                <TextView
+                    android:id="@+id/popList2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/popList"
+                    android:padding="5dp"
+                    android:text="Details"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/police_cas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/popList2"
+                    android:padding="5dp"
+                    android:text="Police CAS No."
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:id="@+id/pop_reported_by"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignTop="@id/dismissPop"
+                    android:layout_toEndOf="@id/dismissPop"
+                    android:text="Reported by"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="15sp"
+                    android:visibility="invisible" />
+
+                <Button
+                    android:id="@+id/dismissPop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/police_cas"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="14dp"
+                    android:background="@drawable/button_rectangle"
+                    android:text="Close"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="10dp"/>
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+    </ScrollView>
+
+</LinearLayout>

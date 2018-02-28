@@ -6,6 +6,10 @@
         android:fragment="com.necohorne.hometribe.Activities.SettingsActivity$GeneralPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
         android:title="@string/pref_header_general" />
+    <header
+        android:fragment="com.necohorne.hometribe.Activities.SettingsActivity$IncidentPreferenceFragment"
+        android:icon="@drawable/ic_report_problem_black_24dp"
+        android:title="@string/pref_header_Incidents" />
 
     <header
         android:fragment="com.necohorne.hometribe.Activities.SettingsActivity$NotificationPreferenceFragment"

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    tools:context="com.necohorne.hometribe.Activities.Dialog.CustomInfoWindow">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/relative_layout_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/winTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_toRightOf="@id/iconInfoId"
+                android:text="Title"
+                android:paddingLeft="5dp" />
+
+            <TextView
+                android:id="@+id/distanceFromHomeId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/iconInfoId"
+                android:layout_below="@id/winTitle"
+                android:paddingLeft="5dp"
+                android:text="Distance From Home:" />
+
+            <ImageView
+                android:id="@+id/iconInfoId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_report_problem_black_24dp" />
+
+            <Button
+                android:id="@+id/btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/winTitle"
+                android:layout_alignBottom="@+id/winTitle"
+                android:layout_alignEnd="@+id/distanceFromHomeId"
+                android:background="@android:color/transparent"
+                android:text="More Info..."
+                android:textColor="@color/colorAccent" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
+
+

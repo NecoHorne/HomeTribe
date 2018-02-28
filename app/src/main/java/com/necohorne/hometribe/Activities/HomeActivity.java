@@ -146,7 +146,7 @@ public class HomeActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = mHomePrefs.edit();
             Gson gson = new Gson();
             String json = gson.toJson(home);
-            editor.putString( "home", json );
+            editor.putString("home", json );
             editor.commit();
 
             getHomePrefs();

@@ -91,7 +91,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/incident_province_spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/incident_province_spinner"/>
 
     <Button
         android:id="@+id/report_incident_submit_button"

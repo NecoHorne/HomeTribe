@@ -84,6 +84,7 @@
     <!-- Strings for Firebase Data Nodes-->
     <string name="dbnode_user">users</string>
     <string name="dbnode_incidents">incidents</string>
+    <string name="dbnode_uid">uid</string>
 
     <!-- Strings for Incidents-->
     <string name="field_incident_type">incident_type</string>
@@ -96,6 +97,7 @@
     <string name="field_incident_description">incident_description</string>
     <string name="field_police_cas_number">police_cas_number</string>
     <string name="field_reported_by">reported_by</string>
+    <string name="field_user_id">"user_id"</string>
 
 
     <!-- Example settings for Notifications -->
@@ -114,7 +116,6 @@
     <string name="password">Password</string>
     <string name="resend_verification_email">Resend Verification Email</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="alert">Alert</string>
     <string name="alert_home_prompt">Please note you have not yet set your Home Location. Home Tribe needs this location to load up incidents around your home. Don\'t worry as this information will not be shared or be visable to anybody but you.</string>
@@ -124,4 +125,17 @@
     <string name="incidents_week_title">Show Incidents within the last week</string>
     <string name="incidents_month_title">Show Incidents within the last month</string>
     <string name="incidents_3month_title">Show Incidents within the last 3 months</string>
+
+    <string name="pref_default_email_address">Email Address</string>
+    <string name="pref_title_email_address">Email Address</string>
+    <string name="pref_title_distance_from_Home">Show Incidents within:</string>
+    <string name="pref_incident_time_title">Show Incidents within the last:</string>
+    <string name="pref_header_Incidents">Incident Settings</string>
+  
+    <!--Alert Dialog Strings-->
+  <string name="km_from_home">\u0020 Km away from Home</string>
+  <string name="date">Date: \u0020</string>
+  <string name="description">Description: \u0020</string>
+  <string name="police_cas">Police CAS No: \u0020 </string>
+
 </resources>
