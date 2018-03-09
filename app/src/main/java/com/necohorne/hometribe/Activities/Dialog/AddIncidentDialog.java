@@ -327,6 +327,7 @@ public class AddIncidentDialog extends DialogFragment{
             }
         } );
         alertDialog.show();
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     private void getTimeFromPicker(){
@@ -353,5 +354,6 @@ public class AddIncidentDialog extends DialogFragment{
             }
         } );
         alertDialog.show();
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 }

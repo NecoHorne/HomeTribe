@@ -71,7 +71,10 @@ public class NotificationHelper extends ContextWrapper{
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Notification.Builder getStandardChannelNotification(String title, String description, double distance, String streetName) {
+    public Notification.Builder getStandardChannelNotification(String title, String description, double distance, String streetName, LatLng location) {
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.putExtra(getString(R.string.notification_location), location.toString() );
         return new Notification.Builder(getApplicationContext(), ANDROID_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(description)
@@ -80,7 +83,7 @@ public class NotificationHelper extends ContextWrapper{
                         PendingIntent.getActivity(
                                 getApplicationContext(),
                                 0,
-                                new Intent( getApplicationContext(),MainActivity.class),
+                                intent,
                                 PendingIntent.FLAG_UPDATE_CURRENT ) )
                 .setSmallIcon(R.drawable.ic_report_problem_black_24dp)
                 .setStyle( new Notification.BigTextStyle()

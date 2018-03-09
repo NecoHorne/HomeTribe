@@ -21,11 +21,12 @@ public class NewIncidentNotification {
     private static final String NOTIFICATION_TAG = "NewIncident";
 
     public static void notify(final Context context,
-                              final String title,final String description, double distance, String streetName, final int number) {
+                              final String title,final String description, double distance, String streetName, LatLng location, final int number) {
         final Resources res = context.getResources();
         final Bitmap picture = BitmapFactory.decodeResource( context.getResources(), R.drawable.ic_android_black_24dp);
 
         Intent mainIntent = new Intent(context, MainActivity.class);
+        mainIntent.putExtra(context.getString(R.string.notification_location), location.toString());
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
@@ -64,7 +65,7 @@ public class NewIncidentNotification {
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationHelper notificationHelper = new NotificationHelper( context );
-            Notification.Builder builder = notificationHelper.getStandardChannelNotification(title, description, distance, streetName);
+            Notification.Builder builder = notificationHelper.getStandardChannelNotification(title, description, distance, streetName, location);
             notificationHelper.getManager().notify(101, builder.build());
         }
     }

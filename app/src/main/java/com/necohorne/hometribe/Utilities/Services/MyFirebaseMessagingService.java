@@ -90,7 +90,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         sIncidentLocation = getLocation(sLocation);
                         String address = getStreetAddress( sIncidentLocation);
                         double distance = distanceFormatting(computeDistanceBetween(sHomeLocation, sIncidentLocation) / 1000);
-                        NewIncidentNotification.notify( getApplicationContext(), title, description, distance, address, 1 );
+                        NewIncidentNotification.notify( getApplicationContext(), title, description, distance, address, sIncidentLocation, 1 );
                     }
                 }
                 @Override

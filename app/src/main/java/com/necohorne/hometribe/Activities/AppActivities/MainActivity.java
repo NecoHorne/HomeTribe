@@ -566,7 +566,7 @@ public class MainActivity extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
             getIncidentLocations();
         }
-
+        notificationIntent();
     }
 
     private int getMapStyle(){
@@ -664,7 +664,6 @@ public class MainActivity extends AppCompatActivity
                     homeMarkerOptions.position(mHomeLatLng);
                     homeMarkerOptions.title("My Home");
                     Marker marker = mMap.addMarker(homeMarkerOptions);
-                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 14));
                 } catch (IOException e){
                     e.printStackTrace();
                 }
@@ -1014,6 +1013,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     //------------OTHER------------//
+    private void notificationIntent(){
+        Intent noticeIntent = getIntent();
+        if (noticeIntent.hasExtra(getString(R.string.notification_location ))){
+            String location = noticeIntent.getStringExtra( getString( R.string.notification_location));
+            String format1 = location.replaceAll( "[(]", "" );
+            String format2 = format1.replaceAll( "[)]", "" );
+            String format3 = format2.substring(9);
+            String[] latlong =  format3.split(",");
+            double latitude = Double.parseDouble(latlong[0]);
+            double longitude = Double.parseDouble(latlong[1]);
+            LatLng inLoc = new LatLng( latitude, longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 17));
+            noticeIntent.removeExtra(getString( R.string.notification_location));
+        }
+    }
+
     private Bitmap getBitmap(int drawableRes) {
         Drawable drawable = getResources().getDrawable(drawableRes);
         Canvas canvas = new Canvas();
