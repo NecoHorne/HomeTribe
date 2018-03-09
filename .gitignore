@@ -16,4 +16,6 @@
 .firebaserc
 package-lock.json
 node_modules
+/values/google_maps_api.xml
+/values/strings.xml
 
