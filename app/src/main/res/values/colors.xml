@@ -31,5 +31,5 @@
     <color name="nightcolorPrimary">#455A64</color>
     <color name="nightcolorPrimaryDark">#37474f</color>
     <color name="nightcolorAccent">#546E7A</color>
-    <color name="transparent">#80000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

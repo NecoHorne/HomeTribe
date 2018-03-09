@@ -72,11 +72,11 @@ public class AddIncidentDialog extends DialogFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-            try {
-                mView = inflater.inflate(R.layout.activity_add_incident_dialog , container, false);
-            } catch (InflateException e) {
-                return mView;
-            }
+        try {
+            mView = inflater.inflate(R.layout.activity_add_incident_dialog , container, false);
+        } catch (InflateException e) {
+            return mView;
+        }
 
         mContext = getActivity();
         mAuth = FirebaseAuth.getInstance();
@@ -92,7 +92,6 @@ public class AddIncidentDialog extends DialogFragment{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
         Fragment mf = mAutocompleteFragment.getFragmentManager().findFragmentById( R.id.incident_place_autocomplete_fragment  );
         if (mf != null)
             getFragmentManager().beginTransaction().remove(mf).commit();
@@ -100,9 +99,9 @@ public class AddIncidentDialog extends DialogFragment{
 
     private void setupUi() {
 
-        mIncidentSpinner = (Spinner) mView.findViewById( R.id.report_incident_spinner );
+        mIncidentSpinner = (Spinner) mView.findViewById(R.id.report_incident_spinner );
         incidentSpinnerUI();
-        mProvinceSpinner = (Spinner) mView.findViewById( R.id.incident_province_spinner);
+        mProvinceSpinner = (Spinner) mView.findViewById(R.id.incident_province_spinner);
         provinceSpinnerUI();
         mHourSpinner = (Spinner) mView.findViewById(R.id.hour_spinner);
         hourSpinnerUI();
@@ -115,7 +114,7 @@ public class AddIncidentDialog extends DialogFragment{
 
         mDescription = (EditText) mView.findViewById(R.id.report_incident_description);
         mPoliceNumber = (EditText) mView.findViewById(R.id.report_incident_cas_number);
-        Button submitBotton = (Button) mView.findViewById( R.id.report_incident_submit_button );
+        Button submitBotton = (Button) mView.findViewById(R.id.report_incident_submit_button );
 
         submitBotton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,7 +145,6 @@ public class AddIncidentDialog extends DialogFragment{
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
                 Log.i(TAG, "An error occurred: " + status);
             }
         });

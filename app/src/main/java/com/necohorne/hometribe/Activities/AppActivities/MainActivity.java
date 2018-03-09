@@ -1,6 +1,7 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,7 +19,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
@@ -35,8 +35,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,14 +50,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,8 +61,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.necohorne.hometribe.Activities.Chat.ChatFragment;
 import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.CustomInfoWindow;
+import com.necohorne.hometribe.Activities.Dialog.DeleteIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.HomePromptSetup;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
@@ -89,6 +87,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 
 import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
 
@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity
     private static final float DEFAULT_OUTLINE_WIDTH_DP = 30;
     private float mDefaultSize;
     private Intent mLogOutIntent;
+    public static boolean isActivityRunning;
 
     //------------SHARED PREFS------------//
     private SharedPreferences mHomePrefs;
@@ -125,24 +126,19 @@ public class MainActivity extends AppCompatActivity
     private AddIncidentDialog mIncidentDialog;
 
     //------------BOTTOM MENU BAR------------//
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.bottom_nav_home:
-                    homeLocation();
-                    Toast.makeText( MainActivity.this, "Home", Toast.LENGTH_LONG ).show();
+                    goHome();
                     return true;
                 case R.id.bottom_nav_chat:
-//                     open chat window drawer
+                    openChatWindow();
                     return true;
                 case R.id.bottom_nav_incident:
-                    if (mIncidentDialog != null){
-                        mIncidentDialog.setInitialSavedState(null);
-                        mIncidentDialog = null;
-                    }
-                    mIncidentDialog = new AddIncidentDialog();
-                    mIncidentDialog.show(getFragmentManager(), "activity_add_incident_dialog");
+                    addIncidentDialog();
                     return true;
             }
             return false;
@@ -178,6 +174,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStart() {
+        isActivityRunning = true;
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
         updateUserProfile();
         checkAuthenticationState();
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity
     protected void onRestart() {
         getPrefs();
         homePromptDialog();
-        homeLocation();
+        redrawMap();
         uploadUser();
         super.onRestart();
     }
@@ -199,12 +201,57 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        isActivityRunning = false;
+        super.onStop();
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById( R.id.drawer_layout );
         if (drawer.isDrawerOpen( GravityCompat.START )) {
             drawer.closeDrawer( GravityCompat.START );
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void redrawMap(){
+        settingsPrefsSetUp();
+        mMap.clear();
+        setUpLocation();
+        homeLocation();
+        getIncidentLocations();
+    }
+
+    public void addIncidentDialog(){
+        if (mIncidentDialog != null){
+            mIncidentDialog.setInitialSavedState(null);
+            mIncidentDialog = null;
+        }
+        mIncidentDialog = new AddIncidentDialog();
+        mIncidentDialog.show(getFragmentManager(), "activity_add_incident_dialog");
+    }
+
+    public void openChatWindow(){
+        if (prefBool){
+            Bundle args = new Bundle();
+            args.putString(getString(R.string.bundle_home), mHome.getLocation().toString());
+            ChatFragment bottomSheetFragment = new ChatFragment();
+            bottomSheetFragment.setArguments(args);
+            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+        } else {
+            Toast.makeText(MainActivity.this, "Please set Home Location to enable chat", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void goHome(){
+        if (prefBool){
+            homeLocation();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
+            Toast.makeText( MainActivity.this, "Home", Toast.LENGTH_SHORT ).show();
+        } else {
+            Toast.makeText( MainActivity.this, "Please set Home Location to enable this function", Toast.LENGTH_SHORT ).show();
         }
     }
 
@@ -226,9 +273,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.menu_log_out:
                 logOut();
-                break;
-            case  R.id.account_settings:
-                //TODO
                 break;
         }
         return super.onOptionsItemSelected( item );
@@ -322,8 +366,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
         View headerView = navigationView.getHeaderView(0);
-        ImageView profilePicture = (ImageView) headerView.findViewById( R.id.nav_profile_image );
-        TextView userName = (TextView) headerView.findViewById( R.id.nav_profile_name );
+        final ImageView profilePicture = (ImageView) headerView.findViewById( R.id.nav_profile_image );
+        final TextView userName = (TextView) headerView.findViewById( R.id.nav_profile_name );
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String provider = user.getProviders().toString();
 
@@ -331,16 +375,33 @@ public class MainActivity extends AppCompatActivity
             String uid;
             String email;
             if (provider.equals("[password]")) {
-                uid = user.getUid();
                 mName = user.getDisplayName();
-                email = user.getEmail();
-                mPhotoUrl = user.getPhotoUrl();
+                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
+                Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid());
+                Log.d( TAG, "Marker Query: "+ query);
+                query.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()){
+                            Log.d( TAG, "Marker Datasnapshot" );
+                            Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                            String url = (String) objectMap.get( "profile_image" );
+                            mPhotoUrl = Uri.parse(url);
+                            Picasso.with(MainActivity.this)
+                                    .load(mPhotoUrl)
+                                    .into( profilePicture );
+                            userName.setText(mName);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                } );
             }else if (provider.equals( "[facebook.com]" )) {
                 for (UserInfo profile : user.getProviderData()) {
                     String facebookUserId = "";
-                    uid = profile.getUid();
                     mName = profile.getDisplayName();
-                    email = profile.getEmail();
                     mPhotoUrl = profile.getPhotoUrl();
                     if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
                         facebookUserId = profile.getUid();
@@ -350,10 +411,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }else if (provider.equals( "[google.com]" )){
                 for (UserInfo profile : user.getProviderData()) {
-                    String providerId = profile.getProviderId();
-                    uid = profile.getUid();
                     mName = profile.getDisplayName();
-                    email = profile.getEmail();
                     mPhotoUrl = profile.getPhotoUrl();
                 }
         }
@@ -486,7 +544,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType( GoogleMap.MAP_TYPE_NORMAL);
-        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), R.raw.silver));
+        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), R.raw.aub_style));
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
@@ -495,6 +553,12 @@ public class MainActivity extends AppCompatActivity
         mMap.setInfoWindowAdapter(new CustomInfoWindow(getApplicationContext()));
         mMap.setOnInfoWindowClickListener(MainActivity.this);
         mMap.setOnMarkerClickListener(MainActivity.this);
+        if (prefBool){
+            homeLocation();
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
+            getIncidentLocations();
+        }
+
     }
 
     private void setUpLocation() {
@@ -565,7 +629,7 @@ public class MainActivity extends AppCompatActivity
                     homeMarkerOptions.position(mHomeLatLng);
                     homeMarkerOptions.title("My Home");
                     Marker marker = mMap.addMarker(homeMarkerOptions);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 14));
+                    //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 14));
                 } catch (IOException e){
                     e.printStackTrace();
                 }
@@ -602,21 +666,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setUpInfoWindowDialog(Marker marker) {
-
+    private void setUpInfoWindowDialog(final Marker marker) {
+        //setup the marker with an AlertDialog Builder
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder( MainActivity.this );
         View view = getLayoutInflater().inflate(R.layout.marker_popup, null);
+        dialogBuilder.setView(view);
+        final AlertDialog alertDialog = dialogBuilder.create();
 
-        IncidentCrime incident = (IncidentCrime) marker.getTag();
+        //get incident data from the marker Tag.
+        final IncidentCrime incident = (IncidentCrime) marker.getTag();
 
+        //setup Marker UI
         TextView incidentType = view.findViewById( R.id.pop_incident_type );
         TextView distance = view.findViewById( R.id.pop_distance);
         TextView date = view.findViewById(R.id.popList);
         TextView details = view.findViewById( R.id.popList2);
         TextView policeCAS = view.findViewById( R.id.police_cas);
         Button dissmissPop = view.findViewById(R.id.dismissPop);
+        ImageButton deleteButton = view.findViewById( R.id.pop_up_delete);
         final TextView reportedBy = view.findViewById(R.id.pop_reported_by);
 
+        //get and init marker data from incident data.
         if (incident != null){
             if (incident.getIncident_type() != null){
                 incidentType.setText(incident.getIncident_type());
@@ -636,33 +706,61 @@ public class MainActivity extends AppCompatActivity
                 policeCAS.setText(getString(R.string.police_cas) + incident.getPolice_cas_number());
             }
             if (incident.getReported_by() != null){
-                String uid = incident.getReported_by();
-                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-                Query query = userRef.child( getString( R.string.dbnode_user)).child(uid);
-                Log.d( TAG, "Marker Query: "+ query);
-                query.addListenerForSingleValueEvent( new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
-                            Log.d( TAG, "Marker Datasnapshot" );
-                            Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
-                            String userName = (String) objectMap.get( "user_name" );
-                            if (userName.equals( "Place Holder" )){
-                            }else {
-                                reportedBy.setText("Reported By: "+ "\n" + userName);
-                                reportedBy.setVisibility(View.VISIBLE);
+                final String uid = incident.getReported_by();
+                if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals( uid )){
+                    reportedBy.setText("Reported By: "+ "\n" + "you");
+                    reportedBy.setVisibility( View.VISIBLE);
+                    reportedBy.setOnClickListener( new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity( new Intent( MainActivity.this, UserProfileActivity.class));
+                        }
+                    } );
+                    // if the user was the reporter, delete button becomes visible and user will be able to delete incident
+                    if (uid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                        deleteButton.setVisibility(View.VISIBLE);
+                        deleteButton.setOnClickListener( new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                deleteIncidentDialog(incident);
+                                alertDialog.dismiss();
+                            }
+                        } );
+                    }
+                }else {
+                    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
+                    Query query = userRef.child(getString(R.string.dbnode_user)).child(uid);
+                    Log.d( TAG, "Marker Query: "+ query);
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(final DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()){
+                                Log.d( TAG, "Marker Datasnapshot" );
+                                Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                                String userName = (String) objectMap.get( "user_name" );
+                                if (userName.equals( "Place Holder" )){
+                                }else {
+                                    reportedBy.setText("Reported By: "+ "\n" + userName);
+                                    reportedBy.setVisibility(View.VISIBLE);
+                                    reportedBy.setOnClickListener( new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            Intent otherUser = new Intent(MainActivity.this, OtherUserActivity.class);
+                                            otherUser.putExtra(getString(R.string.field_other_uid), uid);
+                                            startActivity(otherUser);
+                                        }
+                                    } );
+                                }
                             }
                         }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                } );
+                        }
+                    } );
+                }
             }
         }
-        dialogBuilder.setView(view);
-        final AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -672,6 +770,15 @@ public class MainActivity extends AppCompatActivity
                 alertDialog.dismiss();
             }
         } );
+    }
+
+    private void deleteIncidentDialog(IncidentCrime incident) {
+        String keyRef = incident.getReference();
+        DeleteIncidentDialog deleteIncidentDialog = new DeleteIncidentDialog();
+        Bundle args = new Bundle();
+        args.putString(getString(R.string.field_key_ref), keyRef);
+        deleteIncidentDialog.setArguments(args);
+        deleteIncidentDialog.show(getFragmentManager(), "dialog_delete_incident" );
     }
 
     @Override
@@ -720,6 +827,8 @@ public class MainActivity extends AppCompatActivity
                         incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
                         incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
 
+                        incident.setReference(singleSnapshot.getKey());
+
                         setUpIncidentMarkers(incident);
                     }
                     homeLocation();
@@ -757,16 +866,15 @@ public class MainActivity extends AppCompatActivity
                 if (days <= incidentTimePref){
                     if (distanceFromHome <= distanceFromHomePref){
                         LatLng location = incident.getIncident_location();
-                            Bitmap homeMarker = getBitmap(R.drawable.ic_loc_icon_red);
-                            Bitmap resizedBitmap = Bitmap.createScaledBitmap(homeMarker, (int) mDefaultSize, (int) mDefaultSize, false);
-                            MarkerOptions markerOptions = new MarkerOptions();
-                            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(resizedBitmap));
-                            markerOptions.title(incident.getIncident_type());
-                            markerOptions.position(location);
-                            markerOptions.snippet(dfromHFormat + "Km Away" + "\n" +
-                            "Incident Date: " + incident.getIncident_date());
-                            Marker marker = mMap.addMarker(markerOptions);
-                            marker.setTag(incident);
+                        Bitmap catMarker = markerType(incident);
+                        MarkerOptions markerOptions = new MarkerOptions();
+                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(catMarker));
+                        markerOptions.title(incident.getIncident_type());
+                        markerOptions.position(location);
+                        markerOptions.snippet(dfromHFormat + "Km Away" + "\n" +
+                        "Incident Date: " + incident.getIncident_date());
+                        Marker marker = mMap.addMarker(markerOptions);
+                        marker.setTag(incident);
                     }
                 }
             }
@@ -796,21 +904,78 @@ public class MainActivity extends AppCompatActivity
 
     private Calendar convertDate(IncidentCrime incident) {
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
         try {
             cal.setTime(sdf.parse(incident.getIncident_date()));
-            Log.d( TAG, "set date to calander success");
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Log.d( TAG, "onDataChange: Date" + incident.getIncident_date() );
-
         return cal;
     }
 
     public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
         long diffInMillies = date2.getTime() - date1.getTime();
         return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    }
+
+    public Bitmap markerType(IncidentCrime incident){
+
+        Bitmap redMarker = getBitmap(R.drawable.ic_loc_icon_red);
+        Bitmap resizeRed = Bitmap.createScaledBitmap(redMarker, (int) mDefaultSize, (int) mDefaultSize, false);
+        Bitmap orangeMarker = getBitmap(R.drawable.ic_loc_icon_orange);
+        Bitmap resizeOrange = Bitmap.createScaledBitmap(orangeMarker, (int) mDefaultSize, (int) mDefaultSize, false);
+        Bitmap yellowMarker = getBitmap(R.drawable.ic_loc_icon_yellow);
+        Bitmap resizeYellow = Bitmap.createScaledBitmap(yellowMarker, (int) mDefaultSize, (int) mDefaultSize, false);
+
+        String type = incident.getIncident_type();
+
+        switch (type){
+            case "House Burglary":
+                return resizeOrange;
+            case "House Robbery":
+                return resizeOrange;
+            case "Theft of a Motor Vehicle":
+                return resizeOrange;
+            case "Theft from a Motor Vehicle":
+                return resizeYellow;
+            case "Hi-jacking":
+                return resizeOrange;
+            case "Damage to property / Arson":
+                return resizeYellow;
+            case "Pick-pocketing or bag-snatching":
+                return resizeYellow;
+            case "Armed Robbery":
+                return resizeOrange;
+            case "Robbery with aggravating circumstances":
+                return resizeRed;
+            case "Commercial Burglary":
+                return resizeOrange;
+            case "Shoplifting":
+                return resizeYellow;
+            case "Commercial Robbery":
+                return resizeOrange;
+            case "Stock-theft":
+                return resizeYellow;
+            case "Farm Murder":
+                return resizeRed;
+            case "Farm attack":
+                return resizeRed;
+            case "Murder":
+                return resizeRed;
+            case "Attempted Murder":
+                return resizeRed;
+            case "Rape":
+                return resizeRed;
+            case "Kidnapping":
+                return resizeOrange;
+            case "Assault":
+                return resizeYellow;
+            case "Sexual Assault":
+                return resizeRed;
+            case "other…":
+                return resizeYellow;
+        }
+        return  null;
     }
 
     //------------OTHER------------//
@@ -835,5 +1000,4 @@ public class MainActivity extends AppCompatActivity
         float displayDensity = dm.density;
         mDefaultSize = displayDensity * DEFAULT_OUTLINE_WIDTH_DP;
     }
-
 }

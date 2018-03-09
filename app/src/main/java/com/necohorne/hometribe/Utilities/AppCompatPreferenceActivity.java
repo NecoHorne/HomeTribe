@@ -1,4 +1,4 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Utilities;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

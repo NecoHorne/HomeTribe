@@ -1,14 +1,9 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +18,6 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,17 +32,20 @@ import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.necohorne.hometribe.Activities.Dialog.ResendVerificationDialog;
 import com.necohorne.hometribe.Activities.Dialog.ResetPasswordDialog;
 import com.necohorne.hometribe.R;
 
 import io.fabric.sdk.android.Fabric;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -56,6 +53,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
     private Intent mLoggedInIntent;
+
+    public static boolean isActivityRunning;
 
     //------------UI WIDGETS------------//
     private EditText email;
@@ -108,10 +107,9 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-
-        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
-
         super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+        isActivityRunning = true;
     }
 
     @Override
@@ -120,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
         if (mAuthListener != null){
             FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
         }
+        isActivityRunning = false;
     }
 
     //------------Authentication------------//
@@ -127,25 +126,20 @@ public class LoginActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-
                 mUser = firebaseAuth.getCurrentUser();
-
                 if (mUser != null) {
                     //user is signed in
                     String provider = mUser.getProviders().toString();
-
+                    checkAndLogFCMToken();
                     if (mUser.isEmailVerified()) {
-                        Log.d( TAG, "onAuthStateChanged: signed in" + mUser.getUid() );
                         Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
                     } else if (provider.equals( "[facebook.com]" )) {
-                        Log.d( TAG, "onAuthStateChanged: Facebook signed in" + mUser.getUid() );
                         Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
                     }else if (provider.equals( "[google.com]" )){
-                        Log.d( TAG, "onAuthStateChanged: Google signed in" + mUser.getUid() );
                         Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
                         finish();
@@ -158,6 +152,40 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
+    }
+
+    private void checkAndLogFCMToken() {
+        //Firebase cloud messaging tokens change from time, method checks if token exists on the DB, if not it will add it
+        //if it exists but is not the same as the current one the method will over write with the latest token.
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String token = FirebaseInstanceId.getInstance().getToken();
+        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
+        Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid()).child("fcm_token");
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    // check if current key matches online key. if not write the new one
+                    if (!dataSnapshot.equals(token)){
+                        userRef.child(getString(R.string.dbnode_user))
+                                .child(user.getUid())
+                                .child("fcm_token")
+                                .setValue(token);
+                    }
+                }else {
+                    //token does not exist, write new one to user.
+                    userRef.child(getString(R.string.dbnode_user))
+                            .child(user.getUid())
+                            .child("fcm_token")
+                            .setValue(token);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        } );
     }
 
     //------------LOGIN SETUP------------//

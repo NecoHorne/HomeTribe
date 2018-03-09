@@ -4,6 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -12,8 +16,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service android:name=".Utilities.Services.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <service android:name=".Utilities.Services.MyFirebaseIdService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
-            android:name=".Activities.LoginActivity"
+            android:name=".Activities.AppActivities.LoginActivity"
             android:theme="@style/Theme.AppTheme.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,27 +61,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".Activities.AppActivities.MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Activities.SettingsActivity"
+            android:name=".Activities.AppActivities.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".Activities.MainActivity">
+            android:parentActivityName=".Activities.AppActivities.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.necohorne.hometribe.Activities.MainActivity" />
+                android:value="com.necohorne.hometribe.Activities.AppActivities.MainActivity" />
         </activity>
         <activity
-            android:name=".Activities.RegisterNewAccount"
+            android:name=".Activities.AppActivities.RegisterNewAccount"
             android:theme="@style/Theme.AppTheme.Light.NoActionBar" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="639de560ac89f43146f7e02b39ea1fde04281360" />
 
-        <activity android:name=".Activities.HomeActivity" />
-        <activity android:name=".Activities.UserProfileActivity" />
+        <activity android:name=".Activities.AppActivities.HomeActivity" />
+        <activity
+            android:name=".Activities.AppActivities.UserProfileActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Activities.AppActivities.OtherUserActivity"
+            android:theme="@style/Theme.AppTheme.Light.NoActionBar" />
     </application>
 
 </manifest>

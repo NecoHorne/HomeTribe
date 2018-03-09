@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.necohorne.hometribe.Activities.HomeActivity;
+import com.necohorne.hometribe.Activities.AppActivities.HomeActivity;
 import com.necohorne.hometribe.R;
 
 /**

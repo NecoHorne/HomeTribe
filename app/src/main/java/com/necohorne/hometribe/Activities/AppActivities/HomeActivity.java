@@ -1,4 +1,4 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -20,6 +20,9 @@ import com.google.android.gms.location.places.PlaceDetectionClient;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
@@ -47,6 +50,8 @@ public class HomeActivity extends AppCompatActivity {
     private String mChosenProvince;
     private SharedPreferences mHomePrefs;
 
+    public static boolean isActivityRunning;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +63,18 @@ public class HomeActivity extends AppCompatActivity {
         if (prefBool){
             getHomePrefs();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isActivityRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActivityRunning = false;
     }
 
     private void uiSetup() {
@@ -141,6 +158,12 @@ public class HomeActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            DatabaseReference dataRef = FirebaseDatabase.getInstance().getReference();
+            dataRef.child(getString(R.string.dbnode_user))
+                    .child( FirebaseAuth.getInstance().getCurrentUser().getUid())
+                    .child("home_location")
+                    .setValue(homePlace.getLatLng());
 
             mHomePrefs = getSharedPreferences( Constants.PREFS_HOME, 0 );
             SharedPreferences.Editor editor = mHomePrefs.edit();

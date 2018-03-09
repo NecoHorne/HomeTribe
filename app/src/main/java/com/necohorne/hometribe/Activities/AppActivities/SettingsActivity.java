@@ -1,4 +1,4 @@
-package com.necohorne.hometribe.Activities;
+package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -20,6 +20,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
+import com.necohorne.hometribe.Utilities.AppCompatPreferenceActivity;
 import com.necohorne.hometribe.R;
 
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
+    public static boolean isActivityRunning;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -124,6 +127,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         super.onCreate( savedInstanceState );
         setupActionBar();
 
+    }
+
+    @Override
+    protected void onStart() {
+        isActivityRunning = true;
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        isActivityRunning = false;
+        super.onStop();
     }
 
     /**

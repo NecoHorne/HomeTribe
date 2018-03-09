@@ -22,6 +22,7 @@ public class IncidentCrime {
     private String incident_description;
     private String police_cas_number;
     private String reported_by;
+    private String reference;
 
     //------------CONSTRUCTORS------------//
     public IncidentCrime() {
@@ -110,5 +111,13 @@ public class IncidentCrime {
 
     public void setReported_by(String reported_by) {
         this.reported_by = reported_by;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 }
