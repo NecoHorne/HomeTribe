@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -219,6 +220,10 @@ public class MainActivity extends AppCompatActivity
     private void redrawMap(){
         settingsPrefsSetUp();
         mMap.clear();
+        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle()));
+        if (!success) {
+            Log.e(TAG, "Style parsing failed.");
+        }
         setUpLocation();
         homeLocation();
         getIncidentLocations();
@@ -323,6 +328,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_home:
                 Intent homeIntent = new Intent( MainActivity.this, HomeActivity.class);
                 startActivity(homeIntent);
+                break;
+            case R.id.nav_stats:
+                //
                 break;
             case R.id.nav_friends:
                 //
@@ -544,7 +552,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setMapType( GoogleMap.MAP_TYPE_NORMAL);
-        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), R.raw.aub_style));
+        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle()));
         if (!success) {
             Log.e(TAG, "Style parsing failed.");
         }
@@ -559,6 +567,33 @@ public class MainActivity extends AppCompatActivity
             getIncidentLocations();
         }
 
+    }
+
+    private int getMapStyle(){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
+        String mapsPref = pref.getString("prefs_maps", "normal");
+        int resource;
+        switch (mapsPref){
+            case "aub_style":
+                resource = R.raw.aub_style;
+                return resource;
+            case "dark_style":
+                resource = R.raw.dark_style;
+                return resource;
+            case "night_style":
+                resource = R.raw.night_style;
+                return resource;
+            case "normal":
+                resource = R.raw.normal;
+                return resource;
+            case "retro_style":
+                resource = R.raw.retro_style;
+                return resource;
+            case "silver":
+                resource = R.raw.silver;
+                return resource;
+        }
+        return Integer.parseInt( null );
     }
 
     private void setUpLocation() {

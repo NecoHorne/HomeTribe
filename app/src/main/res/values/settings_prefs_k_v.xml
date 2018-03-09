@@ -22,4 +22,22 @@
     </string-array>
     <string name="pref_distance_default">5</string>
     <string name="pref_time_default">31</string>
+
+    <string-array name="pref_entries_map">
+        <item>Aubergine</item>
+        <item>Dark</item>
+        <item>Night</item>
+        <item>Retro</item>
+        <item>Silver</item>
+        <item>Normal</item>
+    </string-array>
+    <string-array name="pref_values_map">
+        <item>aub_style</item>
+        <item>dark_style</item>
+        <item>night_style</item>
+        <item>retro_style</item>
+        <item>silver</item>
+        <item>normal</item>
+    </string-array>
+    <string name="pref_map_default">normal</string>
 </resources>

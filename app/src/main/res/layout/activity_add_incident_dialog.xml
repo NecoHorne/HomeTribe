@@ -120,79 +120,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/hour_spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/alert_time" />
 
-    <EditText
-        android:id="@+id/report_incident_day"
+    <TextView
+        android:id="@+id/alert_time"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="DD"
-        android:inputType="number"
-        android:textAlignment="center"
+        android:padding="5dp"
+        android:text="Time"
         android:textColor="@color/Black"
-        android:textColorHint="@color/Black"
-        app:layout_constraintEnd_toStartOf="@+id/report_incident_month"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/alert_date" />
+
+    <TextView
+        android:id="@+id/alert_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:padding="5dp"
+        android:text="Date"
+        android:textColor="@color/Black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
-
-    <EditText
-        android:id="@+id/report_incident_month"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="MM"
-        android:inputType="number"
-        android:textAlignment="center"
-        android:textColor="@color/Black"
-        android:textColorHint="@color/Black"
-        app:layout_constraintEnd_toStartOf="@+id/report_incident_year"
-        app:layout_constraintStart_toEndOf="@+id/report_incident_day"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
-
-    <EditText
-        android:id="@+id/report_incident_year"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="YYYY"
-        android:inputType="number"
-        android:textAlignment="center"
-        android:textColor="@color/Black"
-        android:textColorHint="@color/Black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/report_incident_month"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_spinner" />
-
-    <Spinner
-        android:id="@+id/hour_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/minutes_spinner"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_day" />
-
-    <Spinner
-        android:id="@+id/minutes_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/hour_spinner"
-        app:layout_constraintTop_toBottomOf="@+id/report_incident_year" />
 
 </android.support.constraint.ConstraintLayout>

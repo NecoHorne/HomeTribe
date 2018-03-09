@@ -21,7 +21,7 @@ public class NewIncidentNotification {
     private static final String NOTIFICATION_TAG = "NewIncident";
 
     public static void notify(final Context context,
-                              final String title,final String description, double distance, final int number) {
+                              final String title,final String description, double distance, String streetName, final int number) {
         final Resources res = context.getResources();
         final Bitmap picture = BitmapFactory.decodeResource( context.getResources(), R.drawable.ic_android_black_24dp);
 
@@ -46,9 +46,9 @@ public class NewIncidentNotification {
                                     mainIntent,
                                     PendingIntent.FLAG_UPDATE_CURRENT ) )
                     .setStyle( new NotificationCompat.BigTextStyle()
-                            .bigText(description)
+                            .bigText("New Incident " + distance +" Km away from Home." + "\n\n" + description)
                             .setBigContentTitle(title)
-                            .setSummaryText("New Incident " + distance +" Km away from Home."))
+                            .setSummaryText(streetName))
                     .addAction(
                             R.drawable.ic_action_stat_share,
                             res.getString( R.string.action_share ),
@@ -64,7 +64,7 @@ public class NewIncidentNotification {
 
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             NotificationHelper notificationHelper = new NotificationHelper( context );
-            Notification.Builder builder = notificationHelper.getStandardChannelNotification(title, description, distance);
+            Notification.Builder builder = notificationHelper.getStandardChannelNotification(title, description, distance, streetName);
             notificationHelper.getManager().notify(101, builder.build());
         }
     }

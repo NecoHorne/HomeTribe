@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.media.RingtoneManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -31,10 +33,13 @@ import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.R;
 import com.necohorne.hometribe.Utilities.NewIncidentNotification;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
@@ -83,11 +88,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
                         String sLocation = (objectMap.get(context.getString(R.string.field_incident_location )).toString());
                         sIncidentLocation = getLocation(sLocation);
+                        String address = getStreetAddress( sIncidentLocation);
                         double distance = distanceFormatting(computeDistanceBetween(sHomeLocation, sIncidentLocation) / 1000);
-                        NewIncidentNotification.notify( getApplicationContext(), title, description, distance, 1 );
+                        NewIncidentNotification.notify( getApplicationContext(), title, description, distance, address, 1 );
                     }
                 }
-
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
@@ -120,6 +125,24 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             e.printStackTrace();
         }
         return dfH;
+    }
+
+    private String getStreetAddress(LatLng location){
+        String address = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation(location.latitude, location.longitude, 1);
+            if (addressList.size() > 0) {
+
+                if (addressList.get( 0 ).getThoroughfare()!= null) {
+                    address = addressList.get( 0 ).getThoroughfare();
+                }
+            }
+        } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return address;
     }
 
 }

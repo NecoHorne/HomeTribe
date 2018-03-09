@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionClient;
@@ -113,7 +114,10 @@ public class HomeActivity extends AppCompatActivity {
 
         mAutocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.home_place_autocomplete_fragment);
-
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setCountry("ZA")
+                .build();
+        mAutocompleteFragment.setFilter(typeFilter);
         mAutocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {

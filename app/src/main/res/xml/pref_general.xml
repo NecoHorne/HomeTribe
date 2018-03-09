@@ -1,20 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="@string/pref_distance_default"
-        android:entries="@array/pref_entries_distance"
-        android:entryValues="@array/pref_values_distance"
-        android:key="prefs_distance_from_home"
+        android:defaultValue="@string/pref_map_default"
+        android:entries="@array/pref_entries_map"
+        android:entryValues="@array/pref_values_map"
+        android:key="prefs_maps"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_distance_from_Home"/>
-    <ListPreference
-        android:defaultValue="@string/pref_time_default"
-        android:entries="@array/pref_entries_time"
-        android:entryValues="@array/pref_values_time"
-        android:key="prefs_time_home"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_incident_time_title"/>
+        android:title="@string/pref_title_map_style" />
 
 </PreferenceScreen>

@@ -71,7 +71,7 @@ public class NotificationHelper extends ContextWrapper{
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public Notification.Builder getStandardChannelNotification(String title, String description, double distance) {
+    public Notification.Builder getStandardChannelNotification(String title, String description, double distance, String streetName) {
         return new Notification.Builder(getApplicationContext(), ANDROID_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(description)
@@ -84,9 +84,9 @@ public class NotificationHelper extends ContextWrapper{
                                 PendingIntent.FLAG_UPDATE_CURRENT ) )
                 .setSmallIcon(R.drawable.ic_report_problem_black_24dp)
                 .setStyle( new Notification.BigTextStyle()
-                        .bigText(description)
+                        .bigText("New Incident " + distance +" Km away from Home." + "\n\n" + description)
                         .setBigContentTitle(title)
-                        .setSummaryText( "New Incident " + distance +" Km away from Home." ))
+                        .setSummaryText(streetName))
                 .setAutoCancel(true);
     }
 }
