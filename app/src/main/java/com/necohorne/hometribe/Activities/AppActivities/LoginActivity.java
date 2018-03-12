@@ -130,7 +130,6 @@ public class LoginActivity extends AppCompatActivity {
                 if (mUser != null) {
                     //user is signed in
                     String provider = mUser.getProviders().toString();
-                    checkAndLogFCMToken();
                     if (mUser.isEmailVerified()) {
                         Toast.makeText(LoginActivity.this, "Logged In", Toast.LENGTH_LONG).show();
                         startActivity( mLoggedInIntent );
@@ -152,40 +151,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-    }
-
-    private void checkAndLogFCMToken() {
-        //Firebase cloud messaging tokens change from time, method checks if token exists on the DB, if not it will add it
-        //if it exists but is not the same as the current one the method will over write with the latest token.
-
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final String token = FirebaseInstanceId.getInstance().getToken();
-        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-        Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid()).child("fcm_token");
-        query.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
-                    // check if current key matches online key. if not write the new one
-                    if (!dataSnapshot.equals(token)){
-                        userRef.child(getString(R.string.dbnode_user))
-                                .child(user.getUid())
-                                .child("fcm_token")
-                                .setValue(token);
-                    }
-                }else {
-                    //token does not exist, write new one to user.
-                    userRef.child(getString(R.string.dbnode_user))
-                            .child(user.getUid())
-                            .child("fcm_token")
-                            .setValue(token);
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        } );
     }
 
     //------------LOGIN SETUP------------//

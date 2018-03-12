@@ -13,7 +13,8 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@+id/chat_rel_layout"
         android:layout_marginEnd="30dp"
-        android:text="12:00" />
+        android:text="12:00"
+        android:textSize="13sp" />
 
     <RelativeLayout
         android:id="@+id/relLayout1"
@@ -43,7 +44,7 @@
         android:layout_marginStart="46dp"
         android:layout_marginTop="5dp"
         android:background="@drawable/accent_border"
-        android:padding="10dp">
+        android:padding="6dp">
 
         <TextView
             android:id="@+id/message"
@@ -53,6 +54,7 @@
             android:layout_marginRight="10dp"
             android:text="message"
             android:textColor="@color/Black"
-            android:textSize="13sp" />
+            android:textSize="15sp"
+            android:textIsSelectable="true"/>
     </RelativeLayout>
 </RelativeLayout>

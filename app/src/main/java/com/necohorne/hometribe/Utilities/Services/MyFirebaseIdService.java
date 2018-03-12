@@ -15,12 +15,13 @@ import com.necohorne.hometribe.R;
 public class MyFirebaseIdService extends FirebaseInstanceIdService {
 
     private static final String TAG = "MyFirebaseIdService";
+    private static final FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     @Override
     public void onTokenRefresh() {
         super.onTokenRefresh();
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        FirebaseUser user = mAuth.getCurrentUser();
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         userRef.child(getString( R.string.dbnode_user))
                 .child(user.getUid())

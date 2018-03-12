@@ -62,7 +62,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived( remoteMessage );
-
         String identifyDataType = remoteMessage.getData().get(getString( R.string.data_type));
             if (identifyDataType.equals(getString(R.string.data_type_incident))){
                 String title = remoteMessage.getData().get(getString(R.string.data_title));
@@ -141,7 +140,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         } catch (IOException e) {
                 e.printStackTrace();
             }
-
             return address;
     }
 

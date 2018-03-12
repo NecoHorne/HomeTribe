@@ -23,7 +23,7 @@ public class NewIncidentNotification {
     public static void notify(final Context context,
                               final String title,final String description, double distance, String streetName, LatLng location, final int number) {
         final Resources res = context.getResources();
-        final Bitmap picture = BitmapFactory.decodeResource( context.getResources(), R.drawable.ic_android_black_24dp);
+        final Bitmap picture = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round);
 
         Intent mainIntent = new Intent(context, MainActivity.class);
         mainIntent.putExtra(context.getString(R.string.notification_location), location.toString());

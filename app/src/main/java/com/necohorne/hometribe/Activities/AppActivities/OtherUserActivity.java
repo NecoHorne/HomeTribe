@@ -1,6 +1,9 @@
 package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -55,10 +58,11 @@ public class OtherUserActivity extends AppCompatActivity {
     }
 
     private void setUpUi() {
-
         displayName = (TextView) findViewById(R.id.other_user_name);
         homeTown = (TextView) findViewById(R.id.other_town);
         profilePicture = (ImageView) findViewById(R.id.other_user_picture);
+
+        //get intent extras from either infowindow or chat username clicks.
         Intent intent = getIntent();
         String uid = intent.getStringExtra( getString( R.string.field_other_uid));
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
@@ -85,12 +89,23 @@ public class OtherUserActivity extends AppCompatActivity {
                     } catch (IOException e){
                         e.printStackTrace();
                     }
-
-                    String url = (String) objectMap.get( "profile_image" );
-                    Uri photo = Uri.parse(url);
-                    Picasso.with(OtherUserActivity.this)
-                            .load(photo)
-                            .into(profilePicture);
+                    try {
+                        String url = (String) objectMap.get( "profile_image" );
+                        if (!url.equals("content://com.android.providers.media.documents/document/image%3A45")
+                                && !url.equals("null")){
+                            Uri photo = Uri.parse(url);
+                            Picasso.with(OtherUserActivity.this)
+                                    .load(photo)
+                                    .into( profilePicture );
+                        }else {
+                            Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
+                            profilePicture.setImageBitmap(bitmap);
+                        }
+                    } catch (NullPointerException e){
+                        Log.d( TAG, "no profile picture set " + e.toString());
+                        Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
+                        profilePicture.setImageBitmap(bitmap);
+                    }
                         }
             }
             @Override
@@ -109,5 +124,16 @@ public class OtherUserActivity extends AppCompatActivity {
         double latitude = Double.parseDouble(latlong[0]);
         double longitude = Double.parseDouble(latlong[1]);
         return new LatLng(latitude, longitude);
+    }
+
+    private Bitmap getBitmap(int drawableRes) {
+        Drawable drawable = getResources().getDrawable(drawableRes);
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

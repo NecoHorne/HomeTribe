@@ -61,6 +61,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.necohorne.hometribe.Activities.Chat.ChatFragment;
 import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
@@ -74,6 +75,8 @@ import com.necohorne.hometribe.Models.UserProfile;
 import com.necohorne.hometribe.R;
 import com.squareup.picasso.Picasso;
 
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -380,8 +383,6 @@ public class MainActivity extends AppCompatActivity
         String provider = user.getProviders().toString();
 
         if (user != null){
-            String uid;
-            String email;
             if (provider.equals("[password]")) {
                 mName = user.getDisplayName();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
@@ -393,12 +394,26 @@ public class MainActivity extends AppCompatActivity
                         if (dataSnapshot.exists()){
                             Log.d( TAG, "Marker Datasnapshot" );
                             Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
-                            String url = (String) objectMap.get( "profile_image" );
-                            mPhotoUrl = Uri.parse(url);
-                            Picasso.with(MainActivity.this)
-                                    .load(mPhotoUrl)
-                                    .into( profilePicture );
-                            userName.setText(mName);
+                            try {
+                                String url = (String) objectMap.get( "profile_image" );
+                                if (!url.equals("content://com.android.providers.media.documents/document/image%3A45")
+                                        && !url.equals("null")){
+                                    mPhotoUrl = Uri.parse(url);
+                                    Picasso.with(MainActivity.this)
+                                            .load(mPhotoUrl)
+                                            .into( profilePicture );
+                                    userName.setText(mName);
+                                }else {
+                                    Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
+                                    profilePicture.setImageBitmap(bitmap);
+                                    userName.setText(mName);
+                                }
+                            }catch (NullPointerException e){
+                                Log.d( TAG, "no profile picture set " + e.toString());
+                                Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
+                                profilePicture.setImageBitmap(bitmap);
+                                userName.setText(mName);
+                            }
                         }
                     }
                     @Override
@@ -433,6 +448,7 @@ public class MainActivity extends AppCompatActivity
     private UserProfile createUser(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String provider = user.getProviders().toString();
+        final String token = FirebaseInstanceId.getInstance().getToken();
         String firebase = "[password]";
         String facebook = "[facebook.com]";
         String google = "[google.com]";
@@ -450,6 +466,7 @@ public class MainActivity extends AppCompatActivity
                 if (prefBool){
                     newUser.setHome_location(mHome.getLocation());
                 }
+                newUser.setFcm_token(token);
             }else if (provider.equals(facebook)) {
                 for (UserInfo profile : user.getProviderData()) {
                     String facebookUserId = "";
@@ -457,6 +474,7 @@ public class MainActivity extends AppCompatActivity
                     newUser.setUser_name(profile.getDisplayName());
                     newUser.setUser_email(profile.getEmail());
                     newUser.setUser_id(user.getUid());
+                    newUser.setFcm_token(token);
                     if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
                         facebookUserId = profile.getUid();
                         String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
@@ -476,6 +494,7 @@ public class MainActivity extends AppCompatActivity
                     newUser.setUser_email(profile.getEmail());
                     newUser.setProfile_image( String.valueOf( profile.getPhotoUrl() ) );
                     newUser.setUser_id(user.getUid());
+                    newUser.setFcm_token(token);
                     if (profile.getPhoneNumber() != null){
                         newUser.setPhone_number(profile.getPhoneNumber());
                     }
@@ -523,6 +542,13 @@ public class MainActivity extends AppCompatActivity
                     mDatabaseReference.setValue(mUserProfile);
                 }else {
                     Log.d( TAG, "uploadUser, Key Exists, User not uploaded" );
+                    Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    try {
+                        String uid = objectMap.get("user_id").toString();
+                    } catch (NullPointerException e){
+                        mDatabaseReference.setValue( mUserProfile);
+                    }
+                    checkAndLogFCMToken();
                 }
             }
             @Override
@@ -538,6 +564,40 @@ public class MainActivity extends AppCompatActivity
             startActivity( mLogOutIntent);
             finish();
         }
+    }
+
+    private void checkAndLogFCMToken() {
+        //Firebase cloud messaging tokens change from time, method checks if token exists on the DB, if not it will add it
+        //if it exists but is not the same as the current one the method will over write with the latest token.
+
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final String token = FirebaseInstanceId.getInstance().getToken();
+        final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
+        Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid()).child("fcm_token");
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    // check if current key matches online key. if not write the new one
+                    if (!dataSnapshot.equals(token)){
+                        userRef.child(getString(R.string.dbnode_user))
+                                .child(user.getUid())
+                                .child("fcm_token")
+                                .setValue(token);
+                    }
+                }else {
+                    //token does not exist, write new one to user.
+                    userRef.child(getString(R.string.dbnode_user))
+                            .child(user.getUid())
+                            .child("fcm_token")
+                            .setValue(token);
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        } );
     }
 
     private void homePromptDialog(){
@@ -715,7 +775,8 @@ public class MainActivity extends AppCompatActivity
         TextView distance = view.findViewById( R.id.pop_distance);
         TextView date = view.findViewById(R.id.popList);
         TextView details = view.findViewById( R.id.popList2);
-        TextView policeCAS = view.findViewById( R.id.police_cas);
+        TextView policeCAS = view.findViewById(R.id.police_cas);
+        TextView streetAddress = view.findViewById(R.id.pop_street_name);
         Button dissmissPop = view.findViewById(R.id.dismissPop);
         ImageButton deleteButton = view.findViewById( R.id.pop_up_delete);
         final TextView reportedBy = view.findViewById(R.id.pop_reported_by);
@@ -725,20 +786,40 @@ public class MainActivity extends AppCompatActivity
             if (incident.getIncident_type() != null){
                 incidentType.setText(incident.getIncident_type());
             }
+            //get and set street address
+            String address = "";
+            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+            try {
+                List<Address> addressList = geocoder.getFromLocation(incident.getIncident_location().latitude, incident.getIncident_location().longitude, 1);
+                if (addressList.size() > 0) {
+                    if (addressList.get(0).getThoroughfare()!= null) {
+                        address = addressList.get(0).getThoroughfare();
+                        streetAddress.setText(address);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                streetAddress.setVisibility(View.INVISIBLE);
+            }
+            //get and calculate distance from users home
             if (incident.getIncident_location() != null){
                 double distanceFromHome = checkDistance(incident);
                 double dfromHFormat = distanceFormatting(distanceFromHome);
                 distance.setText(dfromHFormat + getString(R.string.km_from_home));
             }
+            //get and set date
             if (incident.getIncident_date() != null){
                 date.setText(getString(R.string.date) + incident.getIncident_date());
             }
+            //get and set description
             if (incident.getIncident_description() != null){
                 details.setText(getString(R.string.description) + incident.getIncident_description());
             }
+            //get and set police CAS number
             if (incident.getPolice_cas_number() != null){
                 policeCAS.setText(getString(R.string.police_cas) + incident.getPolice_cas_number());
             }
+            //get reported by uid, if it is the same as user idea, reported by you else check database and get reported by user details.
             if (incident.getReported_by() != null){
                 final String uid = incident.getReported_by();
                 if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals( uid )){
@@ -960,6 +1041,9 @@ public class MainActivity extends AppCompatActivity
         Bitmap resizeOrange = Bitmap.createScaledBitmap(orangeMarker, (int) mDefaultSize, (int) mDefaultSize, false);
         Bitmap yellowMarker = getBitmap(R.drawable.ic_loc_icon_yellow);
         Bitmap resizeYellow = Bitmap.createScaledBitmap(yellowMarker, (int) mDefaultSize, (int) mDefaultSize, false);
+        Bitmap dog = getBitmap( R.drawable.ic_siberian_husky );
+        Bitmap resizeDog = Bitmap.createScaledBitmap(dog, (int) mDefaultSize, (int) mDefaultSize, false);
+
 
         String type = incident.getIncident_type();
 
@@ -988,6 +1072,8 @@ public class MainActivity extends AppCompatActivity
                 return resizeYellow;
             case "Commercial Robbery":
                 return resizeOrange;
+            case "Dog Poisoning":
+                return resizeDog;
             case "Stock-theft":
                 return resizeYellow;
             case "Farm Murder":
@@ -1024,7 +1110,7 @@ public class MainActivity extends AppCompatActivity
             double latitude = Double.parseDouble(latlong[0]);
             double longitude = Double.parseDouble(latlong[1]);
             LatLng inLoc = new LatLng( latitude, longitude);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 17));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 18));
             noticeIntent.removeExtra(getString( R.string.notification_location));
         }
     }

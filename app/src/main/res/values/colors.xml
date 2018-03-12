@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#ff8e72</color>
-    <color name="colorPrimaryDark">#ED6A5E</color>
-    <color name="colorAccent">#1DE9B6</color>
+    <color name="colorPrimary">#6aa428</color>
+    <color name="colorPrimaryDark">#387500</color>
+    <color name="colorAccent">#00b8d4</color>
 
     <color name="Black">#000000</color>
     <color name="White">#ffffff</color>
@@ -32,4 +32,14 @@
     <color name="nightcolorPrimaryDark">#37474f</color>
     <color name="nightcolorAccent">#546E7A</color>
     <color name="transparent">#00000000</color>
+    
+    <color name="greenMid">#5d971b</color>
+    <color name="greenDark">#5d8f23</color>
+    <color name="greenlight">#6aa428</color>
+    
+    <!--LogoJoy Colors-->
+    <color name="greenPrimary">#6aa428</color>
+    <color name="greenprimDark">#387500</color>
+    <color name="greenPrimLight">#9cd659</color>
+    <color name="greenPrimAccent">#00b8d4</color>
 </resources>

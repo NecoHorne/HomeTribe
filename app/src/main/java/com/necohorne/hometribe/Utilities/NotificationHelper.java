@@ -78,7 +78,7 @@ public class NotificationHelper extends ContextWrapper{
         return new Notification.Builder(getApplicationContext(), ANDROID_CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(description)
-                .setLargeIcon(BitmapFactory.decodeResource( getApplicationContext().getResources(), R.drawable.ic_android_black_24dp))
+                .setLargeIcon(BitmapFactory.decodeResource( getApplicationContext().getResources(), R.mipmap.ic_launcher_round))
                 .setContentIntent(
                         PendingIntent.getActivity(
                                 getApplicationContext(),

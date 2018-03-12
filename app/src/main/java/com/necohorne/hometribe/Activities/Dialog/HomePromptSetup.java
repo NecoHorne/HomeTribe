@@ -28,6 +28,7 @@ public class HomePromptSetup extends DialogFragment {
         mView = inflater.inflate( R.layout.fragment_home_prompt , container, false);
         mContext = getActivity();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
+        getDialog().setCancelable(false);
 
         TextView setLocation = (TextView) mView.findViewById( R.id.home_prompt_set );
         setLocation.setOnClickListener( new View.OnClickListener() {

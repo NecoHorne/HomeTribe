@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.necohorne.hometribe.Activities.AppActivities.LoginActivity"
-    android:background="@drawable/login_activity_background_gradient">
+    android:background="@color/greenMid" >
 
 
     <Button
@@ -17,10 +17,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/facebook_button_rectangle"
-        android:fontFamily="serif-monospace"
+        android:fontFamily="sans-serif"
         android:text="Facebook Login"
         android:textColor="@color/com_facebook_button_login_silver_background_color"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/google_login_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,17 +38,17 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="532dp"
         android:background="@drawable/google_button_rectangle"
-        android:fontFamily="serif-monospace"
+        android:fontFamily="sans-serif"
         android:text="Google Login"
         android:textColor="@color/com_facebook_button_login_silver_background_color"
-        android:textSize="16sp"
+        android:textSize="14sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.464" />
+        app:layout_constraintVertical_bias="0.605" />
 
     <EditText
         android:id="@+id/login_activity_email_edit_text"
@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/button_rectangle"
         android:text="Login"
         android:textColor="@color/cardview_light_background"
@@ -132,6 +132,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/login_resend_verification"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_activity_register_new" />
 
@@ -152,5 +153,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/login_forgot_password"
         app:layout_constraintVertical_bias="0.109" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="188dp"
+        android:layout_height="190dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@mipmap/ic_logo_foreground" />
 
 </android.support.constraint.ConstraintLayout>

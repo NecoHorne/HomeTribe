@@ -5,6 +5,8 @@ import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -20,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -79,6 +82,7 @@ public class UserProfileActivity extends AppCompatActivity implements
     private TextView mBio;
     private EditText mBioEdit;
     private ScrollView mScrollView;
+    private ImageButton editImage;
 
     private FirebaseUser mUser;
     private String mUid;
@@ -190,6 +194,7 @@ public class UserProfileActivity extends AppCompatActivity implements
         mSaveButton = findViewById(R.id.profile_save_button);
         mBio = findViewById(R.id.profile_bio);
         mBioEdit = findViewById(R.id.profile_bio_edit);
+        editImage = findViewById(R.id.profile_edit_picture);
     }
 
     private void editMode() {
@@ -201,8 +206,8 @@ public class UserProfileActivity extends AppCompatActivity implements
         mBio.setVisibility(View.INVISIBLE);
         mBioEdit.setVisibility(View.VISIBLE);
         mEditName.setText(user.getDisplayName());
-        mProfilePicture.setClickable(true);
-        mProfilePicture.setOnClickListener( new View.OnClickListener() {
+        editImage.setVisibility(View.VISIBLE);
+        editImage.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mStoragePermissions){
@@ -233,6 +238,7 @@ public class UserProfileActivity extends AppCompatActivity implements
         mBioEdit.setVisibility(View.INVISIBLE);
         mBio.setVisibility( View.VISIBLE );
         mScrollView.computeScroll();
+        editImage.setVisibility( View.INVISIBLE );
     }
 
     private void updateUserProfile(){
@@ -252,12 +258,26 @@ public class UserProfileActivity extends AppCompatActivity implements
                     if (dataSnapshot.exists()){
                         Log.d( TAG, "Marker Datasnapshot" );
                         Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
-                        String url = (String) objectMap.get( "profile_image" );
-                        mPhotoUrl = Uri.parse(url);
-                        Picasso.with(UserProfileActivity.this)
-                                .load(mPhotoUrl)
-                                .into(mProfilePicture);
-                        mUserName.setText(mName);
+                        try {
+                            String url = (String) objectMap.get( "profile_image" );
+                            if (!url.equals("content://com.android.providers.media.documents/document/image%3A45")
+                                    && !url.equals("null")){
+                                mPhotoUrl = Uri.parse(url);
+                                Picasso.with(UserProfileActivity.this)
+                                        .load(mPhotoUrl)
+                                        .into(mProfilePicture );
+                                mUserName.setText(mName);
+                            }else {
+                                Bitmap bitmap = getBitmap(R.mipmap.ic_launcher_foreground_icon);
+                                mProfilePicture.setImageBitmap(bitmap);
+                                mUserName.setText(mName);
+                            }
+                        }catch (NullPointerException e){
+                            Log.d( TAG, "no profile picture set " + e.toString());
+                            Bitmap bitmap = getBitmap(R.mipmap.ic_launcher_foreground_icon);
+                            mProfilePicture.setImageBitmap(bitmap);
+                            mUserName.setText(mName);
+                        }
                     }
                 }
                 @Override
@@ -368,7 +388,6 @@ public class UserProfileActivity extends AppCompatActivity implements
             case REQUEST_CODE:
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     Log.d(TAG, "onRequestPermissionsResult: User has allowed permission to access: " + permissions[0]);
-
                 }
                 break;
         }
@@ -496,5 +515,16 @@ public class UserProfileActivity extends AppCompatActivity implements
             Toast.makeText(this, "Image is too Large", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private Bitmap getBitmap(int drawableRes) {
+        Drawable drawable = getResources().getDrawable(drawableRes);
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }
