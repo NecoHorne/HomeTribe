@@ -1,4 +1,4 @@
-package com.necohorne.hometribe.Utilities;
+package com.necohorne.hometribe.Utilities.Notifications;
 
 import android.annotation.TargetApi;
 import android.app.Notification;

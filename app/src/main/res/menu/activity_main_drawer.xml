@@ -21,14 +21,6 @@
             android:id="@+id/nav_friends"
             android:icon="@drawable/ic_people_outline_black_24dp"
             android:title="My Neighbours" />
-        <item
-            android:id="@+id/nav_share"
-            android:icon="@drawable/ic_menu_share"
-            android:title="Share" />
-        <item
-            android:id="@+id/test_features"
-            android:icon="@drawable/ic_bug_report_black_24dp"
-            android:title="Features Testing" />
     </group>
 
 </menu>

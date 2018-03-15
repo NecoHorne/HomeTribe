@@ -1,4 +1,4 @@
-package com.necohorne.hometribe.Utilities;
+package com.necohorne.hometribe.Utilities.Notifications;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -22,6 +22,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.necohorne.hometribe.Activities.AppActivities.MainActivity;
+import com.necohorne.hometribe.Activities.AppActivities.PendingNeighbourActivity;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.R;
@@ -41,7 +42,9 @@ import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
 public class NotificationHelper extends ContextWrapper{
     private NotificationManager mManager;
     public static final String ANDROID_CHANNEL_ID = "com.necohorne.hometribe.STANDARD";
+    public static final String NEIGHBOUR_CHANNEL_ID = "com.necohorne.hometribe.NEIGHBOUR";
     public static final String ANDROID_CHANNEL_NAME = "STANDARD CHANNEL";
+    public static final String NEIGHBOUR_CHANNEL_NAME = "NEIGHBOUR CHANNEL";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public NotificationHelper(Context base) {
@@ -60,6 +63,15 @@ public class NotificationHelper extends ContextWrapper{
         androidChannel.setLightColor( Color.GREEN);
         androidChannel.setLockscreenVisibility( Notification.VISIBILITY_PRIVATE);
         getManager().createNotificationChannel(androidChannel);
+
+        // create neighbour channel
+        NotificationChannel neighbourChannel = new NotificationChannel(NEIGHBOUR_CHANNEL_ID,
+                NEIGHBOUR_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+        neighbourChannel.enableLights(true);
+        neighbourChannel.enableVibration(true);
+        neighbourChannel.setLightColor( Color.GREEN);
+        neighbourChannel.setLockscreenVisibility( Notification.VISIBILITY_PRIVATE);
+        getManager().createNotificationChannel(neighbourChannel);
 
     }
 
@@ -90,6 +102,28 @@ public class NotificationHelper extends ContextWrapper{
                         .bigText("New Incident " + distance +" Km away from Home." + "\n\n" + description)
                         .setBigContentTitle(title)
                         .setSummaryText(streetName))
+                .setAutoCancel(true);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Notification.Builder getNeighbourChannelNotification(String username, String uid) {
+
+        Intent intent = new Intent(getApplicationContext(), PendingNeighbourActivity.class);
+        intent.putExtra(getString(R.string.neighbour_intent_extra), uid );
+        return new Notification.Builder(getApplicationContext(), NEIGHBOUR_CHANNEL_ID)
+                .setContentTitle("New Neighbour Request")
+                .setContentText("you have a new Neighbour Request from " + username)
+                .setLargeIcon(BitmapFactory.decodeResource( getApplicationContext().getResources(), R.mipmap.ic_launcher_round))
+                .setContentIntent(
+                        PendingIntent.getActivity(
+                                getApplicationContext(),
+                                0,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT ) )
+                .setSmallIcon(R.drawable.ic_stat_neighbour_request)
+                .setStyle( new Notification.BigTextStyle()
+                        .bigText("you have a new Neighbour Request from " + username)
+                        .setBigContentTitle("New Neighbour Request"))
                 .setAutoCancel(true);
     }
 }

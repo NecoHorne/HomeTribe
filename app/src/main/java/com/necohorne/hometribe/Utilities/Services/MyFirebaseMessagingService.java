@@ -1,16 +1,9 @@
 package com.necohorne.hometribe.Utilities.Services;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
-import android.media.RingtoneManager;
-import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -22,16 +15,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.google.gson.Gson;
-import com.necohorne.hometribe.Activities.AppActivities.HomeActivity;
-import com.necohorne.hometribe.Activities.AppActivities.LoginActivity;
-import com.necohorne.hometribe.Activities.AppActivities.MainActivity;
-import com.necohorne.hometribe.Activities.AppActivities.OtherUserActivity;
-import com.necohorne.hometribe.Activities.AppActivities.SettingsActivity;
-import com.necohorne.hometribe.Activities.AppActivities.UserProfileActivity;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.R;
-import com.necohorne.hometribe.Utilities.NewIncidentNotification;
+import com.necohorne.hometribe.Utilities.Notifications.NeighbourRequestNotification;
+import com.necohorne.hometribe.Utilities.Notifications.NewIncidentNotification;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -62,12 +50,20 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived( remoteMessage );
-        String identifyDataType = remoteMessage.getData().get(getString( R.string.data_type));
+        String identifyDataType = remoteMessage.getData().get(getString(R.string.data_type));
+
+            // Check for new incidents
             if (identifyDataType.equals(getString(R.string.data_type_incident))){
                 String title = remoteMessage.getData().get(getString(R.string.data_title));
                 String description = remoteMessage.getData().get(getString(R.string.data_description));
                 String reference = remoteMessage.getData().get(getString(R.string.data_reference));
                 getIncidentDistance( getApplicationContext(), reference, title, description);
+            }
+
+            //check for new neighbour requests.
+            if (identifyDataType.equalsIgnoreCase( getString( R.string.data_type_neighbour_request ) )){
+                String userId = remoteMessage.getData().get(getString(R.string.data_type_uid));
+                sendNotification(userId);
             }
     }
 
@@ -89,7 +85,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         sIncidentLocation = getLocation(sLocation);
                         String address = getStreetAddress( sIncidentLocation);
                         double distance = distanceFormatting(computeDistanceBetween(sHomeLocation, sIncidentLocation) / 1000);
-                        NewIncidentNotification.notify( getApplicationContext(), title, description, distance, address, sIncidentLocation, 1 );
+                        NewIncidentNotification.notify(getApplicationContext(), title, description, distance, address, sIncidentLocation, 1 );
                     }
                 }
                 @Override
@@ -143,4 +139,26 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             return address;
     }
 
+    private void sendNotification(final String uid){
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(getString( R.string.dbnode_user))
+                .child(uid);
+        Query query = reference;
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()){
+                    Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                    String userName = objectMap.get("user_name").toString();
+                    NeighbourRequestNotification.notify(getApplicationContext(), userName, uid, 1);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        } );
+    }
 }

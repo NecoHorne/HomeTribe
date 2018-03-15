@@ -2,6 +2,7 @@ let functions = require('firebase-functions');
 let admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
+//check for new writes to incident node, send cloud message to nearby users.
 exports.incidentNotification = functions.database.ref('/incidents/{key_ref}').onWrite(event => {
 
     // check to see if the event is a delete or a modification
@@ -64,9 +65,40 @@ exports.incidentNotification = functions.database.ref('/incidents/{key_ref}').on
     });
 });
 
+//check for neighbour request writes to database, send cloud message to user.
+exports.neighbourRequestNotification = functions.database.ref('/users/{key_ref}/sent_neighbour_request/user_id/{push_id}/').onWrite(event => {
+
+    // check to see if the event is a delete or a modification
+    if (!event.data.val() || event.data.previous.val()) {
+        return;
+    }
+
+    const pushId = event.params.push_id;
+    const userId = event.data.val();
+
+    return event.data.ref.parent.parent.parent.parent.parent.once('value').then(snap => {
+        var data = snap.child('users').val();
+        var token = snap.child('users').child(userId).child('/fcm_token').val();
+
+        const payload = {
+            data:{
+                data_type: "data_type_neighbour_request",
+                user_id: userId
+            }
+        }
+
+        return admin.messaging().sendToDevice(token, payload).then(function(response) {
+            return console.log("Successfully sent neighbour request CM:", response);
+            }).catch(function(error) {
+            console.log("Error sending neighbour request CM:", error);
+            });
+
+    });
+
+});
+
 
 //function for checking distance between 2 LatLng objects.
-
 var rad = function(x) {
   return x * Math.PI / 180;
 };

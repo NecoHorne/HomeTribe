@@ -1,13 +1,10 @@
 package com.necohorne.hometribe.Activities.Chat;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,22 +23,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.ChatMessage;
-import com.necohorne.hometribe.Models.Home;
-import com.necohorne.hometribe.Models.IncidentCrime;
 import com.necohorne.hometribe.R;
-import com.necohorne.hometribe.Utilities.ChatRecyclerAdapter;
+import com.necohorne.hometribe.Utilities.RecyclerAdapters.ChatRecyclerAdapter;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;

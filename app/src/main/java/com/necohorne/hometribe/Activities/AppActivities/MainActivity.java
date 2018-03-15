@@ -1,7 +1,6 @@
 package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -76,8 +74,6 @@ import com.necohorne.hometribe.R;
 import com.squareup.picasso.Picasso;
 
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -91,8 +87,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
 
 import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
 
@@ -336,13 +330,8 @@ public class MainActivity extends AppCompatActivity
                 //
                 break;
             case R.id.nav_friends:
-                //
-                break;
-            case R.id.nav_share:
-                //
-                break;
-            case R.id.test_features:
-                //
+                Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class);
+                startActivity(neighbourIntent);
                 break;
             //add more nav menu items
         }

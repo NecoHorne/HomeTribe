@@ -1,39 +1,22 @@
-package com.necohorne.hometribe.Utilities;
+package com.necohorne.hometribe.Utilities.RecyclerAdapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.widget.RecyclerView;
-import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-import com.necohorne.hometribe.Activities.AppActivities.MainActivity;
 import com.necohorne.hometribe.Activities.AppActivities.OtherUserActivity;
 import com.necohorne.hometribe.Activities.AppActivities.UserProfileActivity;
 import com.necohorne.hometribe.Models.ChatMessage;
-import com.necohorne.hometribe.Models.UserProfile;
 import com.necohorne.hometribe.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by necoh on 2018/03/01.

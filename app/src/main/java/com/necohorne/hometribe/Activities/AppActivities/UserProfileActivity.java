@@ -2,6 +2,7 @@ package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.Manifest;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -105,9 +106,6 @@ public class UserProfileActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_user_profile );
-//        Toolbar myToolbar = (Toolbar) findViewById(R.id.profile_toolbar);
-//        setSupportActionBar(myToolbar);
-
         setupUi();
         mHomePrefs = getSharedPreferences(Constants.PREFS_HOME, 0);
         mPrefBool = mHomePrefs.contains(Constants.HOME );
