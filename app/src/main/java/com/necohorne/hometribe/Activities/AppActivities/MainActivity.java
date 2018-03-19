@@ -40,6 +40,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -49,6 +50,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.appinvite.FirebaseAppInvite;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,6 +63,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.dynamiclinks.DynamicLink;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 import com.necohorne.hometribe.Activities.Chat.ChatFragment;
@@ -99,6 +106,7 @@ public class MainActivity extends AppCompatActivity
     private float mDefaultSize;
     private Intent mLogOutIntent;
     public static boolean isActivityRunning;
+    private static final int REQUEST_INVITE = 0;
 
     //------------SHARED PREFS------------//
     private SharedPreferences mHomePrefs;
@@ -152,6 +160,7 @@ public class MainActivity extends AppCompatActivity
         //login
         mAuth = FirebaseAuth.getInstance();
         updateUserProfile();
+        dynamicLinkCreate();
 
         //options Menu Setup
         settingsPrefsSetUp();
@@ -273,9 +282,6 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_settings:
                 startActivity(new Intent( this, SettingsActivity.class ));
                 break;
-            case R.id.menu_log_out:
-                logOut();
-                break;
         }
         return super.onOptionsItemSelected( item );
     }
@@ -332,6 +338,15 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_friends:
                 Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class);
                 startActivity(neighbourIntent);
+                break;
+            case R.id.nav_share:
+                shareInvite();
+                break;
+            case R.id.nav_about:
+                //
+                break;
+            case R.id.nav_log_out:
+                logOut();
                 break;
             //add more nav menu items
         }
@@ -610,9 +625,19 @@ public class MainActivity extends AppCompatActivity
         mMap.setInfoWindowAdapter(new CustomInfoWindow(getApplicationContext()));
         mMap.setOnInfoWindowClickListener(MainActivity.this);
         mMap.setOnMarkerClickListener(MainActivity.this);
+
+        mHomePrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                homeLocation();
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
+                getIncidentLocations();
+            }
+        } );
+
         if (prefBool){
             homeLocation();
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 15));
             getIncidentLocations();
         }
         notificationIntent();
@@ -1124,5 +1149,68 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics dm = MainActivity.this.getResources().getDisplayMetrics();
         float displayDensity = dm.density;
         mDefaultSize = displayDensity * DEFAULT_OUTLINE_WIDTH_DP;
+    }
+
+    public void dynamicLinkCreate(){
+        FirebaseDynamicLinks.getInstance().getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData data) {
+                        if (data == null) {
+                            Log.d(TAG, "getInvitation: no data");
+                            return;
+                        }
+
+                        // Get the deep link
+                        Uri deepLink = data.getLink();
+
+                        // Extract invite
+                        FirebaseAppInvite invite = FirebaseAppInvite.getInvitation(data);
+                        if (invite != null) {
+                            String invitationId = invite.getInvitationId();
+                        }
+
+                        // Handle the deep link
+                        Log.d(TAG, "deepLink:" + deepLink);
+                        if (deepLink != null) {
+                            //
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
+    }
+
+    private void shareInvite(){
+        String mainDynamicLink = "https://d6q57.app.goo.gl/hometribe";
+        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                .setMessage(getString(R.string.invitation_message))
+                .setDeepLink(Uri.parse(mainDynamicLink))
+//                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+//                .setCallToActionText(getString(R.string.invitation_cta))
+                .build();
+        startActivityForResult(intent, REQUEST_INVITE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult( requestCode, resultCode, data );
+        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids) {
+                    Log.d(TAG, "onActivityResult: sent invitation " + id);
+                }
+            } else {
+                Toast.makeText( MainActivity.this, "Share failed, please try again", Toast.LENGTH_SHORT ).show();
+            }
+        }
     }
 }

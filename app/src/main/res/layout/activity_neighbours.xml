@@ -27,7 +27,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/coming_soon"
+        android:fontFamily="sans-serif"
         android:text="You don't have any neighbours saved, search for neighbours in the above searchbar."
         android:textAlignment="center"
         android:textSize="24sp"

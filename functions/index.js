@@ -73,6 +73,7 @@ exports.neighbourRequestNotification = functions.database.ref('/users/{key_ref}/
         return;
     }
 
+    const senderId = event.params.key_ref;
     const pushId = event.params.push_id;
     const userId = event.data.val();
 
@@ -83,7 +84,7 @@ exports.neighbourRequestNotification = functions.database.ref('/users/{key_ref}/
         const payload = {
             data:{
                 data_type: "data_type_neighbour_request",
-                user_id: userId
+                user_id: senderId,
             }
         }
 

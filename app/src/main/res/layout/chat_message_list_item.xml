@@ -43,7 +43,7 @@
         android:layout_below="@+id/relLayout1"
         android:layout_marginStart="46dp"
         android:layout_marginTop="5dp"
-        android:background="@drawable/accent_border"
+        android:background="@drawable/color_prime_border"
         android:padding="6dp">
 
         <TextView
@@ -54,7 +54,7 @@
             android:layout_marginRight="10dp"
             android:text="message"
             android:textColor="@color/Black"
-            android:textSize="15sp"
-            android:textIsSelectable="true"/>
+            android:textIsSelectable="true"
+            android:textSize="15sp" />
     </RelativeLayout>
 </RelativeLayout>

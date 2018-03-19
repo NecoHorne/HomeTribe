@@ -9,19 +9,27 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.necohorne.hometribe.Models.UserProfile;
 import com.necohorne.hometribe.R;
 import com.necohorne.hometribe.Utilities.RecyclerAdapters.NeighbourRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NeighboursActivity extends AppCompatActivity {
 
@@ -30,6 +38,8 @@ public class NeighboursActivity extends AppCompatActivity {
     private Context mContext;
     private TextView emptyList;
     private ArrayList<UserProfile> mNeighbours;
+    private RecyclerView mRecyclerView;
+    private ArrayList<UserProfile> mUserProfiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,24 +47,15 @@ public class NeighboursActivity extends AppCompatActivity {
         setContentView( R.layout.activity_neighbours );
         mContext = getApplicationContext();
         mNeighbours = new ArrayList<>();
-        initUI();
+        initRecycler();
+        neighbourChangeListener();
     }
 
-    private void initUI() {
+    private void initRecycler() {
         emptyList = findViewById( R.id.empty_neighbours );
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.neighbour_recycler);
+        mRecyclerView = (RecyclerView) findViewById( R.id.neighbour_recycler);
         LinearLayoutManager neighbourLayoutManager = new LinearLayoutManager(mContext);
-        recyclerView.setLayoutManager(neighbourLayoutManager);
-        mNeighbourRecyclerAdapter = new NeighbourRecyclerAdapter(mContext);
-        recyclerView.setAdapter(mNeighbourRecyclerAdapter);
-
-        if (mNeighbours.size() == 0){
-            recyclerView.setVisibility(View.INVISIBLE);
-            emptyList.setVisibility(View.VISIBLE);
-        } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyList.setVisibility(View.INVISIBLE);
-        }
+        mRecyclerView.setLayoutManager(neighbourLayoutManager);
     }
 
     @Override
@@ -80,4 +81,108 @@ public class NeighboursActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected( item );
     }
+
+    public void getPendingRequests(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference requestReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(user.getUid())
+                .child(mContext.getString(R.string.dbnode_neighbours))
+                .child("user_id");
+        Query query = requestReference;
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mUserProfiles = new ArrayList<>();
+                mNeighbours = new ArrayList<>();
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot singleSnapshot : dataSnapshot.getChildren()) {
+                        String snap = singleSnapshot.getValue().toString();
+                        UserProfile userProfile = new UserProfile();
+                        userProfile.setUser_id(snap);
+                        mUserProfiles.add(userProfile);
+                    }
+                    getUsersSetup(mUserProfiles);
+                } else {
+                    mNeighbourRecyclerAdapter = new NeighbourRecyclerAdapter(mContext, mNeighbours);
+                    mRecyclerView.setAdapter(mNeighbourRecyclerAdapter);
+                    mNeighbourRecyclerAdapter.notifyDataSetChanged();
+                    if (mNeighbours.size() == 0){
+                        mRecyclerView.setVisibility(View.INVISIBLE);
+                        emptyList.setVisibility(View.VISIBLE);
+                    } else {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        emptyList.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        } );
+    }
+
+    private void getUsersSetup(ArrayList<UserProfile> userProfiles) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child(getString(R.string.dbnode_user));
+
+        for (int i = 0; i < userProfiles.size(); i++ ){
+            UserProfile userProfile = userProfiles.get(i);
+            Query query = reference.child(userProfile.getUser_id());
+            query.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    if (dataSnapshot.exists()){
+                        Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                        UserProfile userProfile = new UserProfile();
+                        userProfile.setUser_name( objectMap.get( "user_name" ).toString() );
+                        userProfile.setProfile_image( objectMap.get( "profile_image" ).toString() );
+                        userProfile.setUser_id( objectMap.get( "user_id" ).toString() );
+                        mNeighbours.add(userProfile);
+                    }
+                    mNeighbourRecyclerAdapter = new NeighbourRecyclerAdapter(mContext, mNeighbours);
+                    mRecyclerView.setAdapter(mNeighbourRecyclerAdapter);
+                    mNeighbourRecyclerAdapter.notifyDataSetChanged();
+                    if (mNeighbours.size() == 0){
+                        mRecyclerView.setVisibility(View.INVISIBLE);
+                        emptyList.setVisibility(View.VISIBLE);
+                    } else {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        emptyList.setVisibility(View.INVISIBLE);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            } );
+        }
+    }
+
+    private void neighbourChangeListener(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference requestReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(user.getUid())
+                .child(mContext.getString(R.string.dbnode_neighbours));
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                getPendingRequests();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        requestReference.addValueEventListener(postListener);
+    }
+
 }

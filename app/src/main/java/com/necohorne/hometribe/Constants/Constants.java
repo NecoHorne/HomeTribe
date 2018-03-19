@@ -12,6 +12,11 @@ public class Constants {
 
     public static final String PREFS_HOME = "prefs_home";
     public static final String HOME = "home";
+    public static final String PREFS_PRIVACY = "prefs_privacy";
+    public static final String PRIVACY = "privacy";
+    public static final String PREFS_TANDC = "prefs_tc";
+    public static final String TANDC = "tc";
+
     public static final String PREFS_DISTANCE = "prefs_distance";
     public static final String DISTANCE = "distance";
     public static final String PREFS_TIME = "prefs_time";

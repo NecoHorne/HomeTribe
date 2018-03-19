@@ -32,14 +32,17 @@
     <color name="nightcolorPrimaryDark">#37474f</color>
     <color name="nightcolorAccent">#546E7A</color>
     <color name="transparent">#00000000</color>
-    
+
     <color name="greenMid">#5d971b</color>
     <color name="greenDark">#5d8f23</color>
     <color name="greenlight">#6aa428</color>
-    
+
     <!--LogoJoy Colors-->
     <color name="greenPrimary">#6aa428</color>
     <color name="greenprimDark">#387500</color>
-    <color name="greenPrimLight">#9cd659</color>
+    <color name="greenPrimLight">#e9f8d9</color>
+    <color name="greenPrimLightN">#9cd659</color>
     <color name="greenPrimAccent">#00b8d4</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

@@ -317,9 +317,17 @@ public class AddIncidentDialog extends DialogFragment{
                 mMonth = mDatePicker.getMonth();
                 mYear = mDatePicker.getYear();
                 StringBuilder stringBuilder = new StringBuilder(  );
-                stringBuilder.append(mDay);
+                if (mDay <= 9){
+                    stringBuilder.append("0" + mDay);
+                }else {
+                    stringBuilder.append(mDay);
+                }
                 stringBuilder.append(" / ");
-                stringBuilder.append(mMonth + 1);
+                if ((mMonth + 1) <= 9){
+                    stringBuilder.append("0" + (mMonth + 1));
+                }else {
+                    stringBuilder.append(mMonth + 1);
+                }
                 stringBuilder.append(" / ");
                 stringBuilder.append(mYear);
                 date.setText(stringBuilder.toString());
@@ -346,9 +354,17 @@ public class AddIncidentDialog extends DialogFragment{
                mHour = timePicker.getCurrentHour();
                mMinute = timePicker.getCurrentMinute();
                 StringBuilder stringBuilder = new StringBuilder(  );
-                stringBuilder.append(mHour);
+                if (mHour <= 9){
+                    stringBuilder.append("0" + mHour);
+                }else {
+                    stringBuilder.append(mHour);
+                }
                 stringBuilder.append(":");
-                stringBuilder.append(mMinute);
+                if (mMinute <= 9){
+                    stringBuilder.append("0" + mMinute);
+                } else {
+                    stringBuilder.append(mMinute);
+                }
                 time.setText(stringBuilder.toString());
                alertDialog.dismiss();
             }

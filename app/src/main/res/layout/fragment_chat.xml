@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/transparent"
+    android:background="@color/greenPrimLight"
     android:padding="5dp"
     android:visibility="visible">
 
@@ -35,7 +35,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="47dp"
-            android:background="@drawable/accent_border"
+            android:background="@drawable/color_prime_border"
             android:orientation="horizontal"
             android:padding="5dp">
 

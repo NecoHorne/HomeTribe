@@ -1,8 +1,11 @@
 package com.necohorne.hometribe.Utilities.RecyclerAdapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +38,7 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
     private View mView;
     private Context mContext;
     private ArrayList<UserProfile> mUserProfiles;
+    private Context popContext;
 
     public PendingNeighRecyclerAdapter(Context context, ArrayList<UserProfile> userProfiles) {
         mContext = context;
@@ -44,6 +48,7 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
     @Override
     public PendingNeighRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mView = LayoutInflater.from(parent.getContext()).inflate( R.layout.pending_neighbour_list_item, parent,false);
+        popContext = parent.getContext();
 
         return new ViewHolder(mView);
     }
@@ -68,7 +73,7 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
             Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_round);
             holder.pendingProfileImage.setImageBitmap(bitmap);
         }
-        holder.pendingUserName.setText( userProfile.getUser_name());
+        holder.pendingUserName.setText(userProfile.getUser_name());
         holder.pendingDeclineButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,6 +81,93 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
             }
         } );
 
+        holder.pendingAcceptButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                requestAlertDialog(userProfile);
+                acceptRequest(userProfile);
+            }
+        } );
+
+    }
+
+    private void requestAlertDialog(final UserProfile userProfile) {
+        //setup the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder( popContext);
+        LayoutInflater inflater = (LayoutInflater) popContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate(R.layout.neighbour_dialog_popup, null);
+        dialogBuilder.setView(view);
+        final AlertDialog alertDialog = dialogBuilder.create();
+
+        //ui elements
+        Button yesButton = view.findViewById( R.id.neighbour_alert_yes);
+        Button noButton = view.findViewById(R.id.neighbour_alert_no);
+
+        alertDialog.show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
+
+        yesButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acceptRequest(userProfile);
+                alertDialog.dismiss();
+            }
+        } );
+
+        noButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        } );
+    }
+
+    private void acceptRequest(UserProfile userProfile) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        // add userID to each users neighbour node in the database.
+        DatabaseReference sendReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(user.getUid())
+                .child(mContext.getString( R.string.dbnode_neighbours))
+                .child("user_id")
+                .child(userProfile.getUser_id());
+        sendReference.setValue(userProfile.getUser_id());
+        DatabaseReference requestReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(userProfile.getUser_id())
+                .child(mContext.getString(R.string.dbnode_neighbours))
+                .child("user_id")
+                .child(user.getUid());
+        requestReference.setValue(user.getUid());
+
+        // request accepted, delete requests from the database.
+        String receiverId = user.getUid();
+        String senderId = userProfile.getUser_id();
+        DatabaseReference receiveReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(receiverId)
+                .child(mContext.getString( R.string.dbnode_neighbour_requests))
+                .child(mContext.getString(R.string.dbnode_user_id))
+                .child(senderId);
+        receiveReference.removeValue();
+        DatabaseReference senderReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(mContext.getString(R.string.dbnode_user))
+                .child(senderId)
+                .child(mContext.getString(R.string.dbnode_sent_neighbour_requests))
+                .child(mContext.getString(R.string.dbnode_user_id))
+                .child(receiverId);
+        senderReference.removeValue();
+
+        Toast.makeText(mContext, "Neighbour Added!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -106,7 +198,7 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
                 .child(mContext.getString(R.string.dbnode_user))
                 .child(receiverId)
                 .child(mContext.getString( R.string.dbnode_neighbour_requests))
-                .child("user_id")
+                .child(mContext.getString(R.string.dbnode_user_id))
                 .child(senderId);
         receiveReference.removeValue();
 
@@ -116,7 +208,7 @@ public class PendingNeighRecyclerAdapter extends RecyclerView.Adapter<PendingNei
                 .child(mContext.getString(R.string.dbnode_user))
                 .child(senderId)
                 .child(mContext.getString(R.string.dbnode_sent_neighbour_requests))
-                .child("user_id")
+                .child(mContext.getString(R.string.dbnode_user_id))
                 .child(receiverId);
         senderReference.removeValue();
 

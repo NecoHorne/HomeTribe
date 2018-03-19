@@ -1,10 +1,13 @@
 package com.necohorne.hometribe.Utilities.RecyclerAdapters;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,7 +31,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.necohorne.hometribe.Activities.AppActivities.MainActivity;
 import com.necohorne.hometribe.Activities.AppActivities.OtherUserActivity;
+import com.necohorne.hometribe.Activities.AppActivities.SearchableActivity;
 import com.necohorne.hometribe.Activities.AppActivities.UserProfileActivity;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
@@ -48,6 +54,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
     private static final String TAG = "SearchRecyclerAdapter";
     private View mView;
     private Context mContext;
+    private Context popContext;
     private ArrayList<UserProfile> mUserProfiles;
     private boolean prefBool;
     private SharedPreferences mHomePrefs;
@@ -60,6 +67,9 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
     @Override
     public SearchRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         mView = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_list_item, parent,false);
+
+        //to call an alert dialog from recycler, the context from the parent needs to be used.
+        popContext = parent.getContext();
 
         mHomePrefs = mContext.getSharedPreferences(Constants.PREFS_HOME, 0);
         prefBool = mHomePrefs.contains(Constants.HOME);
@@ -122,18 +132,42 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
                     .child("user_id")
                     .child(userProfile.getUser_id());
 
-            Query query = requestReference;
-            query.addListenerForSingleValueEvent( new ValueEventListener() {
+            final DatabaseReference neighboursRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference()
+                    .child(mContext.getString(R.string.dbnode_user))
+                    .child(user.getUid())
+                    .child(mContext.getString(R.string.dbnode_neighbours))
+                    .child("user_id")
+                    .child(userProfile.getUser_id());
+
+            Query requestQuery = requestReference;
+            requestQuery.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()){
-                        if (dataSnapshot.getValue().equals(userProfile.getUser_id())){
-                            holder.searchAddButton.setVisibility(View.INVISIBLE);
-                        } else {
-                            setUpAddButton( userProfile, holder);
+                        if (dataSnapshot.getValue().equals(userProfile.getUser_id())) {
+                            holder.searchAddButton.setVisibility( View.INVISIBLE );
+                        }else {
+                            setUpAddButton(userProfile, holder);
                         }
-                    } else {
-                        setUpAddButton( userProfile, holder );
+                    }else {
+                        Query neighbourQuery = neighboursRef;
+                        neighbourQuery.addListenerForSingleValueEvent( new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()){
+                                    holder.searchAddButton.setVisibility( View.INVISIBLE );
+                                } else {
+                                    setUpAddButton( userProfile, holder );
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        } );
                     }
                 }
 
@@ -179,13 +213,45 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
             @Override
             public void onClick(View v) {
                 if (checkDistance(userProfile) < 4){
-                    neighbourRequest(userProfile);
-                    holder.searchAddButton.setVisibility(View.INVISIBLE);
+                    requestAlertDialog(userProfile, holder);
                 } else {
                     Toast.makeText( mContext, "Sorry this user lives too far to be added as a neighbour.", Toast.LENGTH_SHORT).show();
                 }
             }
         } );
+    }
+
+    private void requestAlertDialog(final UserProfile userProfile, final ViewHolder holder) {
+        //setup the dialog
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder( popContext);
+        LayoutInflater inflater = (LayoutInflater) popContext.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+        View view = inflater.inflate(R.layout.neighbour_dialog_popup, null);
+        dialogBuilder.setView(view);
+        final AlertDialog alertDialog = dialogBuilder.create();
+
+        //ui elements
+        Button yesButton = view.findViewById( R.id.neighbour_alert_yes);
+        Button noButton = view.findViewById(R.id.neighbour_alert_no);
+
+        alertDialog.show();
+        alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
+
+        yesButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                neighbourRequest(userProfile);
+                holder.searchAddButton.setVisibility(View.INVISIBLE);
+                alertDialog.dismiss();
+            }
+        } );
+
+        noButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        } );
+
     }
 
     @Override

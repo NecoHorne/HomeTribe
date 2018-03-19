@@ -27,7 +27,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/coming_soon"
+        android:fontFamily="sans-serif"
         android:text="No users found"
         android:textAlignment="center"
         android:textSize="24sp"

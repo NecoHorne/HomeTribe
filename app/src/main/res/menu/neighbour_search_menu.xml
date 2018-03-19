@@ -4,9 +4,9 @@
 
     <item
         android:id="@+id/pending_neighbours"
-        android:icon="@drawable/ic_notifications_black_24dp"
+        android:icon="@drawable/ic_notifications_white_24dp"
         android:title="Pending Neighbour Requests"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
     <item
         android:id="@+id/search_neighbours"
         app:actionViewClass="android.support.v7.widget.SearchView"

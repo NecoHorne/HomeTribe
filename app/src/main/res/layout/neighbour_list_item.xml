@@ -25,12 +25,15 @@
 
             <TextView
                 android:id="@+id/neighbour_address"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/neighbour_user_name"
                 android:layout_below="@+id/neighbour_user_name"
+                android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
                 android:text="street address"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@+id/pending_profile_image"
                 app:layout_constraintTop_toBottomOf="@+id/neighbour_user_name" />
 
@@ -40,10 +43,13 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/neighbour_address"
                 android:layout_below="@+id/neighbour_address"
+                android:layout_marginBottom="8dp"
                 android:layout_marginStart="8dp"
                 android:text="distance from home"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/pending_profile_image"
-                app:layout_constraintTop_toBottomOf="@+id/neighbour_address" />
+                app:layout_constraintTop_toBottomOf="@+id/neighbour_address"
+                app:layout_constraintVertical_bias="0.111" />
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/pending_profile_image"

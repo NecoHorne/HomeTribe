@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/profile_editButton"
-        android:icon="@drawable/ic_edit_black_24dp"
+        android:icon="@drawable/ic_edit_white_24dp"
         android:title="Item"
         app:showAsAction="always" />
 </menu>

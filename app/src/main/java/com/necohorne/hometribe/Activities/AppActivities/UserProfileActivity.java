@@ -2,12 +2,15 @@ package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.Manifest;
 
-import android.content.Intent;
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -29,6 +32,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -53,6 +57,7 @@ import com.google.gson.Gson;
 import com.necohorne.hometribe.Activities.Dialog.ChangePhotoDialog;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
+import com.necohorne.hometribe.Models.UserProfile;
 import com.necohorne.hometribe.R;
 import com.necohorne.hometribe.Utilities.FilePaths;
 import com.necohorne.hometribe.Utilities.UniversalImageLoader;
@@ -62,6 +67,8 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.text.TextUtils.isEmpty;
@@ -80,10 +87,8 @@ public class UserProfileActivity extends AppCompatActivity implements
     private TextView mHomeTown;
     private EditText mEditName;
     private Button mSaveButton;
-    private TextView mBio;
-    private EditText mBioEdit;
-    private ScrollView mScrollView;
     private ImageButton editImage;
+    private Context mContext;
 
     private FirebaseUser mUser;
     private String mUid;
@@ -101,16 +106,19 @@ public class UserProfileActivity extends AppCompatActivity implements
     private byte[] mBytes;
     private double progress;
     private MenuItem mEditButton;
+    private LatLng sHomeLocation;
+    private LatLng myLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate( savedInstanceState );
-        setContentView( R.layout.activity_user_profile );
+        super.onCreate(savedInstanceState );
+        setContentView(R.layout.activity_user_profile );
         setupUi();
         mHomePrefs = getSharedPreferences(Constants.PREFS_HOME, 0);
         mPrefBool = mHomePrefs.contains(Constants.HOME );
         initImageLoader();
         updateUserProfile();
+        verifyStoragePermissions();
     }
 
     @Override
@@ -184,15 +192,13 @@ public class UserProfileActivity extends AppCompatActivity implements
 
     private void setupUi(){
         mIsEditing = false;
-        mScrollView = findViewById( R.id.profile_scroll_view );
         mProfilePicture = findViewById( R.id.profile_circle_image);
         mUserName = findViewById(R.id.profile_display_name);
         mHomeTown = findViewById(R.id.profile_display_town);
         mEditName = findViewById(R.id.user_profile_name_edit );
         mSaveButton = findViewById(R.id.profile_save_button);
-        mBio = findViewById(R.id.profile_bio);
-        mBioEdit = findViewById(R.id.profile_bio_edit);
         editImage = findViewById(R.id.profile_edit_picture);
+        mContext = getApplicationContext();
     }
 
     private void editMode() {
@@ -201,28 +207,26 @@ public class UserProfileActivity extends AppCompatActivity implements
         mIsEditing = true;
         mUserName.setVisibility(View.INVISIBLE);
         mEditName.setVisibility(View.VISIBLE);
-        mBio.setVisibility(View.INVISIBLE);
-        mBioEdit.setVisibility(View.VISIBLE);
         mEditName.setText(user.getDisplayName());
-        editImage.setVisibility(View.VISIBLE);
-        editImage.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mStoragePermissions){
-                    ChangePhotoDialog dialog = new ChangePhotoDialog();
-                    dialog.show(getFragmentManager(), "dialog_changephoto");
-                }else{
-                    verifyStoragePermissions();
+        if (mProvider.equals("[password]")){
+            editImage.setVisibility(View.VISIBLE);
+            editImage.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mStoragePermissions){
+                        ChangePhotoDialog dialog = new ChangePhotoDialog();
+                        dialog.show(getFragmentManager(), "dialog_changephoto");
+                    }else{
+                        verifyStoragePermissions();
+                    }
                 }
-            }
-        } );
+            } );
+        }
         mSaveButton.setVisibility(View.VISIBLE);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateFirebaseUserDetails();
-                //TODO Add Bio save state
-                finish();
             }
         } );
     }
@@ -233,9 +237,6 @@ public class UserProfileActivity extends AppCompatActivity implements
         mUserName.setVisibility(View.VISIBLE);
         mEditName.setVisibility(View.INVISIBLE);
         mSaveButton.setVisibility(View.INVISIBLE);
-        mBioEdit.setVisibility(View.INVISIBLE);
-        mBio.setVisibility( View.VISIBLE );
-        mScrollView.computeScroll();
         editImage.setVisibility( View.INVISIBLE );
     }
 
@@ -291,6 +292,7 @@ public class UserProfileActivity extends AppCompatActivity implements
                 mName = profile.getDisplayName();
                 mEmail = profile.getEmail();
                 mPhotoUrl = profile.getPhotoUrl();
+
                 if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
                     facebookUserId = profile.getUid();
                     String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
@@ -428,7 +430,7 @@ public class UserProfileActivity extends AppCompatActivity implements
             if(mBitmap == null){
 
                 try {
-                    mBitmap = MediaStore.Images.Media.getBitmap(UserProfileActivity.this.getContentResolver(), params[0]);
+                    mBitmap = MediaStore.Images.Media.getBitmap( UserProfileActivity.this.getContentResolver(), params[0]);
                     Log.d(TAG, "doInBackground: bitmap size: megabytes: " + mBitmap.getByteCount()/MB + " MB");
                 } catch (IOException e) {
                     Log.e(TAG, "doInBackground: IOException: ", e.getCause());
@@ -524,5 +526,79 @@ public class UserProfileActivity extends AppCompatActivity implements
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    public void setupBio(FirebaseUser user) {
+        SharedPreferences homePrefs = mContext.getSharedPreferences( Constants.PREFS_HOME, 0 );
+        if (homePrefs.contains( Constants.HOME )) {
+            Gson gson = new Gson();
+            String json = homePrefs.getString( Constants.HOME, "" );
+            Home home = gson.fromJson( json, Home.class );
+            sHomeLocation = home.getLocation();
+
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
+                    .child( mContext.getString( R.string.dbnode_user))
+                    .child(user.getUid());
+            Query query = userRef;
+
+            query.addListenerForSingleValueEvent( new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                        String sLocation = (objectMap.get(mContext.getString(R.string.field_user_home)).toString());
+
+                        String bio;
+                        try {
+                            bio = (objectMap.get("bio").toString());
+                        }catch (NullPointerException e){
+                            Log.d( TAG, "bio Nullpointer " + e );
+                            bio = "";
+                        }
+
+                        myLocation = getLocation(sLocation);
+                        String address = getStreetAddress(myLocation);
+
+                        StringBuilder stringBuilder = new StringBuilder();
+                        stringBuilder.append("Bio: "+ bio);
+                        stringBuilder.append( "\n\n" );
+                        stringBuilder.append("Street Address: "+ address);
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            } );
+
+        }
+    }
+
+    private LatLng getLocation(String location){
+        String regex = "\\blongitude=\\b";
+        String str1 = location.replaceAll( "[{]", "" );
+        String str2 = str1.substring(9);
+        String str3 = str2.replaceAll( "[}]", "" );
+        String str4 = str3.replaceAll( regex, "" );
+        String[] latlong =  str4.split(",");
+        double latitude = Double.parseDouble(latlong[0]);
+        double longitude = Double.parseDouble(latlong[1]);
+        return new LatLng(latitude, longitude);
+    }
+
+    private String getStreetAddress(LatLng location){
+        String address = null;
+        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        try {
+            List<Address> addressList = geocoder.getFromLocation(location.latitude, location.longitude, 1);
+            if (addressList.size() > 0) {
+                if (addressList.get( 0 ).getAddressLine( 0 )!= null) {
+                    address = addressList.get( 0 ).getAddressLine(0);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return address;
     }
 }

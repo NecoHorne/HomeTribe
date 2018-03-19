@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,6 +31,7 @@ public class PendingNeighbourActivity extends AppCompatActivity {
     private ArrayList<UserProfile> mNeighbourProfiles;
     private RecyclerView mRecyclerView;
     private PendingNeighRecyclerAdapter mPendingNeighRecyclerAdapter;
+    private TextView emptyList;
 
 
     @Override
@@ -44,6 +47,7 @@ public class PendingNeighbourActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById( R.id.pending_neigh_recycler);
         LinearLayoutManager pendingLayoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(pendingLayoutManager);
+        emptyList = findViewById(R.id.pending_empty_list);
     }
 
     public void getPendingRequests(){
@@ -73,6 +77,13 @@ public class PendingNeighbourActivity extends AppCompatActivity {
                     mPendingNeighRecyclerAdapter = new PendingNeighRecyclerAdapter(mContext, mNeighbourProfiles);
                     mRecyclerView.setAdapter(mPendingNeighRecyclerAdapter);
                     mPendingNeighRecyclerAdapter.notifyDataSetChanged();
+                    if (mUserProfiles.size() == 0){
+                        mRecyclerView.setVisibility( View.INVISIBLE);
+                        emptyList.setVisibility(View.VISIBLE);
+                    } else {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        emptyList.setVisibility(View.INVISIBLE);
+                    }
                 }
             }
             @Override
@@ -104,6 +115,13 @@ public class PendingNeighbourActivity extends AppCompatActivity {
                     mPendingNeighRecyclerAdapter = new PendingNeighRecyclerAdapter(mContext, mNeighbourProfiles);
                     mRecyclerView.setAdapter(mPendingNeighRecyclerAdapter);
                     mPendingNeighRecyclerAdapter.notifyDataSetChanged();
+                    if (mUserProfiles.size() == 0){
+                        mRecyclerView.setVisibility( View.INVISIBLE);
+                        emptyList.setVisibility(View.VISIBLE);
+                    } else {
+                        mRecyclerView.setVisibility(View.VISIBLE);
+                        emptyList.setVisibility(View.INVISIBLE);
+                    }
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
