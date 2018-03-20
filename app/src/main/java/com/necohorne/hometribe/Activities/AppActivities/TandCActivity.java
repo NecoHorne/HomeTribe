@@ -1,16 +1,25 @@
 package com.necohorne.hometribe.Activities.AppActivities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.R;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class TandCActivity extends AppCompatActivity {
 
@@ -19,6 +28,8 @@ public class TandCActivity extends AppCompatActivity {
     private SharedPreferences tcPrefs;
     private boolean tcAccepted = false;
     private Intent privacyIntent;
+    private WebView mWebView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +42,9 @@ public class TandCActivity extends AppCompatActivity {
         tcButton = (Button) findViewById( R.id.t_and_c_accept_button);
         tcPrefs = getSharedPreferences(Constants.PREFS_PRIVACY, 0);
         tcAccepted = tcPrefs.contains( Constants.PREFS_TANDC);
+        mWebView = (WebView) findViewById(R.id.t_and_c_webview);
+        String mData = getStringFromAssets( "tc.html", TandCActivity.this );
+        mWebView.loadDataWithBaseURL("file///android_asset/",mData, "text/html", "utf-8", null );
 
         tcButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -75,5 +89,25 @@ public class TandCActivity extends AppCompatActivity {
             finish();
         }
         super.onResume();
+    }
+
+    public static String getStringFromAssets(String name, Context p_context)
+    {
+        try
+        {
+            InputStream is = p_context.getAssets().open(name);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            String bufferString = new String(buffer);
+            return bufferString;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+
     }
 }

@@ -343,7 +343,8 @@ public class MainActivity extends AppCompatActivity
                 shareInvite();
                 break;
             case R.id.nav_about:
-                //
+                Intent aboutIntent = new Intent( MainActivity.this, AboutActivity.class);
+                startActivity(aboutIntent);
                 break;
             case R.id.nav_log_out:
                 logOut();

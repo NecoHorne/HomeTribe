@@ -51,11 +51,10 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textView5"
+            <WebView
+                android:id="@+id/t_and_c_webview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@string/t_and_c" />
+                android:layout_height="match_parent" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.constraint.ConstraintLayout>
