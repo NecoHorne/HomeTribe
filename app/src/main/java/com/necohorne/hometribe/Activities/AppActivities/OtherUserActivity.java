@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -60,6 +63,7 @@ public class OtherUserActivity extends AppCompatActivity {
     private ImageButton addButton;
     private boolean prefBool;
     private SharedPreferences mHomePrefs;
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +87,7 @@ public class OtherUserActivity extends AppCompatActivity {
     }
 
     private void setUpUi() {
-        //get intent extras from either infowindow or chat username clicks.
+        //get intent extras from either info window or chat username clicks.
         Intent intent = getIntent();
         final String uid = intent.getStringExtra( getString( R.string.field_other_uid));
 
@@ -91,6 +95,7 @@ public class OtherUserActivity extends AppCompatActivity {
         homeTown = (TextView) findViewById(R.id.other_town);
         profilePicture = (ImageView) findViewById(R.id.other_user_picture);
         addButton = (ImageButton) findViewById( R.id.other_user_add );
+        addMobSetup();
 
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
         Query query = userRef.child(getString(R.string.dbnode_user)).child(uid);
@@ -323,5 +328,17 @@ public class OtherUserActivity extends AppCompatActivity {
             }
         }
         return homeLatLng;
+    }
+
+    private void addMobSetup(){
+        String addMobAppId = "ca-app-pub-8837476093017718~3132418627";
+        String otherBannerAddId = "ca-app-pub-8837476093017718/7931493704";
+        MobileAds.initialize( OtherUserActivity.this, addMobAppId);
+        mAdView = (AdView) findViewById( R.id.ad_view_other_user);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
+                .build();
+        mAdView.loadAd(adRequest);
     }
 }

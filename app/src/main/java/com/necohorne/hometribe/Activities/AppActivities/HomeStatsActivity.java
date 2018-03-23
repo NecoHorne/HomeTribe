@@ -362,13 +362,15 @@ public class HomeStatsActivity extends AppCompatActivity {
 //        ,getResources().getColor(R.color.color2)
             };
 
-        PieDataSet set = new PieDataSet(entries, "Incidents in my Area");
-        set.setColors(color);
-        set.setValueTextColor(getResources().getColor(R.color.Black));
-        set.setValueTextSize(14f);
-        PieData data = new PieData(set);
-        mPieChart.setData(data);
-        mPieChart.setCenterText("Incidents in my Area");
+        if (crimeArrayList.size() > 0){
+            PieDataSet set = new PieDataSet(entries, "Incidents in my Area");
+            set.setColors(color);
+            set.setValueTextColor(getResources().getColor(R.color.Black));
+            set.setValueTextSize(14f);
+            PieData data = new PieData(set);
+            mPieChart.setData(data);
+            mPieChart.setCenterText("Incidents in my Area");
+        }
     }
 
 }

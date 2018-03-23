@@ -23,6 +23,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -72,6 +75,7 @@ public class MapClickAddIncident extends DialogFragment {
     private int mYear;
     private Date mToday;
     private Date mDate;
+    private InterstitialAd mInterstitialAd;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -121,6 +125,9 @@ public class MapClickAddIncident extends DialogFragment {
 
         mDescription = (EditText) mView.findViewById(R.id.map_add_report_incident_description);
         mPoliceNumber = (EditText) mView.findViewById(R.id.map_add_report_incident_cas_number);
+
+        initAds();
+
         Button submitBotton = (Button) mView.findViewById(R.id.map_add_report_incident_submit_button );
 
         submitBotton.setOnClickListener(new View.OnClickListener() {
@@ -334,13 +341,30 @@ public class MapClickAddIncident extends DialogFragment {
                 DatabaseReference newIncident = mDatabase.push();
                 newIncident.setValue( incident );
 
-                getDialog().dismiss();
-                Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                if (mInterstitialAd.isLoaded()){
+                    mInterstitialAd.show();
+                    getDialog().dismiss();
+                    Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                }else {
+                    getDialog().dismiss();
+                    Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                }
             }
 
         } else {
             Toast.makeText( mContext, "All fields except Police CAS number are Mandatory", Toast.LENGTH_SHORT ).show();
         }
+    }
+
+    private void initAds(){
+        String addMobAppId = "ca-app-pub-8837476093017718~3132418627";
+        String addIncidentAd = "ca-app-pub-8837476093017718/4233999268";
+        MobileAds.initialize(mContext, addMobAppId);
+        mInterstitialAd = new InterstitialAd(mContext);
+        mInterstitialAd.setAdUnitId(addIncidentAd);
+        mInterstitialAd.loadAd(new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build());
     }
 
 }

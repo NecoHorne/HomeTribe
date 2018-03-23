@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context="com.necohorne.hometribe.Activities.AppActivities.UserProfileActivity">
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/ad_view_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-8837476093017718/6461541501"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.986"></com.google.android.gms.ads.AdView>
+
     <TextView
         android:id="@+id/profile_display_town"
         android:layout_width="wrap_content"

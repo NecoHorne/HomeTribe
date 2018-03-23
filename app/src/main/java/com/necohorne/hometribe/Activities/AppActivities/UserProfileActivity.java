@@ -32,6 +32,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -108,6 +111,8 @@ public class UserProfileActivity extends AppCompatActivity implements
     private MenuItem mEditButton;
     private LatLng sHomeLocation;
     private LatLng myLocation;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,6 +196,7 @@ public class UserProfileActivity extends AppCompatActivity implements
     }
 
     private void setupUi(){
+        addMobSetup();
         mIsEditing = false;
         mProfilePicture = findViewById( R.id.profile_circle_image);
         mUserName = findViewById(R.id.profile_display_name);
@@ -600,5 +606,17 @@ public class UserProfileActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         return address;
+    }
+
+    private void addMobSetup(){
+        String addMobAppId = "ca-app-pub-8837476093017718~3132418627";
+        String otherBannerAddId = "ca-app-pub-8837476093017718/6461541501";
+        MobileAds.initialize( UserProfileActivity.this, addMobAppId);
+        mAdView = (AdView) findViewById( R.id.ad_view_user);
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
+                .build();
+        mAdView.loadAd(adRequest);
     }
 }

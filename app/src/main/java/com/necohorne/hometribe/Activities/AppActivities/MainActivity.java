@@ -44,6 +44,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -112,6 +115,7 @@ public class MainActivity extends AppCompatActivity
     private Intent mLogOutIntent;
     public static boolean isActivityRunning;
     private static final int REQUEST_INVITE = 0;
+    private AdView mAdView;
 
     //------------SHARED PREFS------------//
     private SharedPreferences mHomePrefs;
@@ -183,6 +187,8 @@ public class MainActivity extends AppCompatActivity
         setupDatabase();
         mLogOutIntent = new Intent(MainActivity.this, LoginActivity.class);
         displayMetrics();
+
+        addMobSetup();
     }
 
     @Override
@@ -1286,5 +1292,16 @@ public class MainActivity extends AppCompatActivity
                 Toast.makeText( MainActivity.this, "Share failed, please try again", Toast.LENGTH_SHORT ).show();
             }
         }
+    }
+
+    private void addMobSetup(){
+        String addMobAppId = "ca-app-pub-8837476093017718~3132418627";
+        String mainBannerAddId = "ca-app-pub-8837476093017718/4640359223";
+        MobileAds.initialize( MainActivity.this, addMobAppId);
+        mAdView = (AdView) findViewById( R.id.adView );
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice( AdRequest.DEVICE_ID_EMULATOR )
+                .build();
+        mAdView.loadAd(adRequest);
     }
 }

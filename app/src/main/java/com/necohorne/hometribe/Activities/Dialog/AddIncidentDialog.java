@@ -25,6 +25,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -37,6 +41,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.necohorne.hometribe.Activities.AppActivities.MainActivity;
 import com.necohorne.hometribe.Models.IncidentCrime;
 import com.necohorne.hometribe.R;
 
@@ -75,6 +80,8 @@ public class AddIncidentDialog extends DialogFragment{
     private Date mToday;
     private Date mDate;
 
+    private InterstitialAd mInterstitialAd;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
@@ -94,6 +101,7 @@ public class AddIncidentDialog extends DialogFragment{
         setupDataBase();
         Calendar calendar = Calendar.getInstance();
         mToday = calendar.getTime();
+
         return mView;
     }
 
@@ -131,13 +139,15 @@ public class AddIncidentDialog extends DialogFragment{
 
         mDescription = (EditText) mView.findViewById(R.id.report_incident_description);
         mPoliceNumber = (EditText) mView.findViewById(R.id.report_incident_cas_number);
+
+        initAds();
+
         Button submitBotton = (Button) mView.findViewById(R.id.report_incident_submit_button );
 
         submitBotton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupIncidentObject();
-
                 }
             }
          );
@@ -279,8 +289,15 @@ public class AddIncidentDialog extends DialogFragment{
                 DatabaseReference newIncident = mDatabase.push();
                 newIncident.setValue( incident );
 
-                getDialog().dismiss();
-                Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                if (mInterstitialAd.isLoaded()){
+                    mInterstitialAd.show();
+                    getDialog().dismiss();
+                    Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                }else {
+                    getDialog().dismiss();
+                    Toast.makeText(mContext, "Incident Reported", Toast.LENGTH_SHORT).show();
+                }
+
             }
 
         } else {
@@ -371,5 +388,16 @@ public class AddIncidentDialog extends DialogFragment{
         } );
         alertDialog.show();
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void initAds(){
+        String addMobAppId = "ca-app-pub-8837476093017718~3132418627";
+        String addIncidentAd = "ca-app-pub-8837476093017718/6256284105";
+        MobileAds.initialize( mContext, addMobAppId);
+        mInterstitialAd = new InterstitialAd(mContext);
+        mInterstitialAd.setAdUnitId(addIncidentAd);
+        mInterstitialAd.loadAd(new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build());
     }
 }
