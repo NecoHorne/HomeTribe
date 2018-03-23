@@ -2,6 +2,8 @@ package com.necohorne.hometribe.Activities.AppActivities;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,6 +27,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -73,6 +77,7 @@ import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.CustomInfoWindow;
 import com.necohorne.hometribe.Activities.Dialog.DeleteIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.HomePromptSetup;
+import com.necohorne.hometribe.Activities.Dialog.MapClickAddIncident;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.Models.IncidentCrime;
@@ -333,7 +338,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(homeIntent);
                 break;
             case R.id.nav_stats:
-                //
+                Intent statsIntent = new Intent( MainActivity.this, HomeStatsActivity.class );
+                startActivity(statsIntent);
                 break;
             case R.id.nav_friends:
                 Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class);
@@ -636,6 +642,8 @@ public class MainActivity extends AppCompatActivity
             }
         } );
 
+        mapClickAddIncident();
+
         if (prefBool){
             homeLocation();
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mHomeLatLng, 15));
@@ -913,10 +921,68 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        if (marker.getTitle().equals("My Home")){
+        if (marker.getTitle().equals("My Home") || marker.getTitle().equals("add_incident_from_Map")){
             return true;
         }
         return false;
+    }
+
+    private void mapClickAddIncident(){
+
+        //add an incident by long clicking on the map.
+
+        mMap.setOnMapLongClickListener( new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(final LatLng latLng) {
+
+                Bitmap addMarker = Bitmap.createScaledBitmap(getBitmap(R.drawable.ic_add_icon), (int) mDefaultSize, (int) mDefaultSize, false);
+                final MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(addMarker));
+                markerOptions.title("add_incident_from_Map");
+                markerOptions.position(latLng);
+                final Marker marker =  mMap.addMarker( markerOptions );
+
+
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = (LayoutInflater) MainActivity.this.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+                View view = inflater.inflate(R.layout.dialog_map_click_add_incident, null);
+                dialogBuilder.setView(view);
+                final AlertDialog alertDialog = dialogBuilder.create();
+
+                Button addButton = (Button) view.findViewById( R.id.map_click_yes);
+                Button cancelButton = (Button) view.findViewById( R.id.map_click_no);
+
+                alertDialog.show();
+                alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
+
+                addButton.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle args = new Bundle();
+                        args.putString("map_click_location", latLng.toString());
+                        MapClickAddIncident mapClickAddIncident = new MapClickAddIncident();
+                        mapClickAddIncident.setArguments(args);
+                        mapClickAddIncident.show( getFragmentManager(), "map_click_add_incident");
+                        alertDialog.dismiss();
+                    }
+                } );
+
+                cancelButton.setOnClickListener( new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+                    }
+                } );
+
+                alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        marker.remove();
+                    }
+                } );
+
+            }
+        } );
     }
 
     //------------INCIDENTS TO FIREBASE DATABASE------------//
@@ -1009,6 +1075,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+
     }
 
     private double distanceFormatting(double distanceFromHome) {
@@ -1188,13 +1255,19 @@ public class MainActivity extends AppCompatActivity
 
     private void shareInvite(){
         String mainDynamicLink = "https://d6q57.app.goo.gl/hometribe";
-        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
-                .setMessage(getString(R.string.invitation_message))
-                .setDeepLink(Uri.parse(mainDynamicLink))
-//                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
-//                .setCallToActionText(getString(R.string.invitation_cta))
-                .build();
-        startActivityForResult(intent, REQUEST_INVITE);
+//        Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+//                .setMessage(getString(R.string.invitation_message))
+//                .setDeepLink(Uri.parse(mainDynamicLink))
+////                .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+////                .setCallToActionText(getString(R.string.invitation_cta))
+//                .build();
+//        startActivityForResult(intent, REQUEST_INVITE);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT,
+                "Hey check out the home tribe app at: " + mainDynamicLink);
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Send to:"));
     }
 
     @Override

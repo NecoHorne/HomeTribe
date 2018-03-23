@@ -47,7 +47,7 @@ public class LauncherActivity extends AppCompatActivity {
                         cancel();
                     }
                 },
-                5000
+                4000
         );
     }
 }

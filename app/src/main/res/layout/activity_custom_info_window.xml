@@ -11,7 +11,8 @@
     <android.support.v7.widget.CardView
         android:id="@+id/card_view_id"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="10dp">
 
         <RelativeLayout
             android:id="@+id/relative_layout_id"
@@ -22,18 +23,18 @@
                 android:id="@+id/winTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textSize="16sp"
                 android:layout_toRightOf="@id/iconInfoId"
+                android:paddingLeft="5dp"
                 android:text="Title"
-                android:paddingLeft="5dp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/distanceFromHomeId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/iconInfoId"
                 android:layout_below="@id/winTitle"
+                android:layout_toRightOf="@id/iconInfoId"
                 android:paddingLeft="5dp"
                 android:text="Distance From Home:" />
 

@@ -131,7 +131,8 @@
         <activity
             android:name=".Activities.AppActivities.AboutActivity"
             android:label="@string/title_activity_about"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Activities.AppActivities.HomeStatsActivity"></activity>
     </application>
 
 </manifest>

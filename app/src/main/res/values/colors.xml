@@ -4,8 +4,7 @@
     <color name="colorPrimaryDark">#387500</color>
     <color name="colorAccent">#00b8d4</color>
 
-    <color name="Black">#000000</color>
-    <color name="White">#ffffff</color>
+
 
     <!--possible alternate color schemes 1-->
     <color name="color1">#FFAF87</color>
@@ -45,4 +44,28 @@
     <color name="greenPrimAccent">#00b8d4</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <!--Pie Colors-->
+    <color name="Red">#e6194b</color>
+    <color name="Green">#3cb44b</color>
+    <color name="Yellow">#ffe119</color>
+    <color name="Blue">#0082c8</color>
+    <color name="Orange">#f58231</color>
+    <color name="Purple">#911eb4</color>
+    <color name="Cyan">#46f0f0</color>
+    <color name="Magenta">#f032e6</color>
+    <color name="Lime">#d2f53c</color>
+    <color name="Pink">#fabebe</color>
+    <color name="Teal">#008080	</color>
+    <color name="Lavender">#e6beff</color>
+    <color name="Brown">#aa6e28</color>
+    <color name="Beige">#fffac8</color>
+    <color name="Maroon">#800000</color>
+    <color name="Mint">#aaffc3</color>
+    <color name="Olive">#808000</color>
+    <color name="Coral">#ffd8b1</color>
+    <color name="Navy">#000080</color>
+    <color name="Grey">#808080</color>
+    <color name="Black">#000000</color>
+    <color name="White">#ffffff</color>
 </resources>
