@@ -4,10 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.necohorne.hometribe.Activities.AppActivities.HomeActivity">
+    tools:context="com.necohorne.hometribe.Activities.AppActivities.HomeActivity"
+    tools:layout_editor_absoluteY="81dp">
 
-    <Spinner
-        android:id="@+id/home_province_spinner2"
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="*Only you and the people you chose to share this information with can see your home address."
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_red_dark"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/home_save_button2" />
+
+    <fragment
+        android:id="@+id/home_place_autocomplete_fragment"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -18,48 +37,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="37dp"
-        android:layout_marginBottom="28dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:text="*Only you and the people you chose to share this information with can see your home address."
-        android:textAlignment="center"
-        android:textColor="@android:color/holo_red_dark"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_save_button2" />
-
-    <fragment
-        android:id="@+id/home_place_autocomplete_fragment"
-        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="52dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_province_spinner2" />
-
     <Button
         android:id="@+id/home_save_button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/button_rectangle"
         android:padding="5dp"
         android:text="Save Home Location"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/home_place_autocomplete_fragment" />
 
@@ -69,12 +57,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="My Home Location"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.072"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -84,9 +72,8 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/home_textView2"
         app:srcCompat="@mipmap/ic_logo_foreground" />

@@ -61,10 +61,8 @@ public class AddIncidentDialog extends DialogFragment{
     private View mView;
     private DatabaseReference mDatabase;
     private Spinner mIncidentSpinner;
-    private Spinner mProvinceSpinner;
     private EditText mDescription;
     private EditText mPoliceNumber;
-    private String mChosenProvince;
     private String mSpecifiedIncident;
     private FirebaseAuth mAuth;
     private Place incidentPlace;
@@ -100,6 +98,8 @@ public class AddIncidentDialog extends DialogFragment{
         getAddress();
         setupDataBase();
         Calendar calendar = Calendar.getInstance();
+        //add 1 minute to calender for incidents that are currently happening
+        calendar.add(Calendar.MINUTE, 1);
         mToday = calendar.getTime();
 
         return mView;
@@ -117,8 +117,6 @@ public class AddIncidentDialog extends DialogFragment{
 
         mIncidentSpinner = (Spinner) mView.findViewById(R.id.report_incident_spinner );
         incidentSpinnerUI();
-        mProvinceSpinner = (Spinner) mView.findViewById(R.id.incident_province_spinner);
-        provinceSpinnerUI();
 
         date = (TextView) mView.findViewById( R.id.alert_date );
         date.setOnClickListener( new View.OnClickListener() {
@@ -142,9 +140,9 @@ public class AddIncidentDialog extends DialogFragment{
 
         initAds();
 
-        Button submitBotton = (Button) mView.findViewById(R.id.report_incident_submit_button );
+        Button submitButton = (Button) mView.findViewById(R.id.report_incident_submit_button );
 
-        submitBotton.setOnClickListener(new View.OnClickListener() {
+        submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setupIncidentObject();
@@ -203,22 +201,6 @@ public class AddIncidentDialog extends DialogFragment{
         } );
     }
 
-    private void provinceSpinnerUI(){
-        ArrayAdapter<CharSequence> provinceAdapter = ArrayAdapter.createFromResource( mContext, R.array.provinces_array, R.layout.spinner_item );
-        provinceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mProvinceSpinner.setAdapter( provinceAdapter );
-        mProvinceSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mChosenProvince = mProvinceSpinner.getSelectedItem().toString();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        } );
-    }
-
     private void setupIncidentObject() {
 
         if (!isEmpty(mDescription.getText().toString())
@@ -244,7 +226,7 @@ public class AddIncidentDialog extends DialogFragment{
                 incident.setCountry(locale);
 
                 //IncidentCrime state_province
-                incident.setState_province(mChosenProvince);
+                //todo
 
                 //IncidentCrime Town
                 Geocoder geocoder = new Geocoder( getApplicationContext(), Locale.getDefault() );
@@ -397,7 +379,7 @@ public class AddIncidentDialog extends DialogFragment{
         mInterstitialAd = new InterstitialAd(mContext);
         mInterstitialAd.setAdUnitId(addIncidentAd);
         mInterstitialAd.loadAd(new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build());
     }
 }

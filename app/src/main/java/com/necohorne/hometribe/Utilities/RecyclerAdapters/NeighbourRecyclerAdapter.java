@@ -187,7 +187,7 @@ public class NeighbourRecyclerAdapter extends RecyclerView.Adapter<NeighbourRecy
     }
 
     private Bitmap getBitmap(int drawableRes) {
-        Drawable drawable = mContext.getResources().getDrawable(drawableRes);
+        Drawable drawable = mContext.getDrawable(drawableRes);
         Canvas canvas = new Canvas();
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         canvas.setBitmap(bitmap);

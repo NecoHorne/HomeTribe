@@ -6,10 +6,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
 import com.necohorne.hometribe.Activities.AppActivities.PendingNeighbourActivity;
@@ -23,21 +26,27 @@ public class NeighbourRequestNotification {
     public static void notify(final Context context, final String username, final String uid, final int number) {
         final Resources res = context.getResources();
 
-        // This image is used as the notification's large icon (thumbnail).
-        // TODO: Remove this if your notification has no relevant thumbnail.
         final Bitmap picture = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher_round);
         Intent neighbourIntent = new Intent( context, PendingNeighbourActivity.class);
+
+        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
+        String strRingtonePreference = preference.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+        Uri sound = Uri.parse(strRingtonePreference);
+
         neighbourIntent.putExtra( context.getString( R.string.neighbour_intent_extra ), uid );
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             final NotificationCompat.Builder builder = new NotificationCompat.Builder( context )
-                    .setDefaults( Notification.DEFAULT_ALL )
+                    .setDefaults( Notification.DEFAULT_LIGHTS)
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setDefaults(Notification.COLOR_DEFAULT)
                     .setSmallIcon( R.drawable.ic_stat_neighbour_request )
-                    .setContentTitle( "New Neighbour Request" )
-                    .setContentText( "you have a new Neighbour Request from " + username )
+                    .setContentTitle("New Neighbour Request")
+                    .setContentText("you have a new Neighbour Request from " + username )
                     .setPriority( NotificationCompat.PRIORITY_DEFAULT )
                     .setLargeIcon( picture )
                     .setNumber( number )
+                    .setSound(sound)
                     .setContentIntent(
                             PendingIntent.getActivity(
                                     context,

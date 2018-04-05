@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -50,6 +51,7 @@ public class ChatFragment extends BottomSheetDialogFragment{
     private ArrayList<ChatMessage> mMessagesList;
     private DatabaseReference mMessagesReference;
     private RecyclerView mRecyclerView;
+    private TextView emptyList;
 
     public ChatFragment() {
     }
@@ -96,6 +98,7 @@ public class ChatFragment extends BottomSheetDialogFragment{
                 sendMessage();
             }
         } );
+        emptyList = (TextView) mView.findViewById(R.id.fragment_chat_empty_list);
     }
 
     private void sendMessage() {
@@ -154,8 +157,13 @@ public class ChatFragment extends BottomSheetDialogFragment{
                         Log.d( TAG, "Get Message: " + chatMessage.toString());
                     }
                 }
-                mChatRecyclerAdapter = new ChatRecyclerAdapter(mContext, mMessagesList);
-                mRecyclerView.setAdapter(mChatRecyclerAdapter);
+                if (mMessagesList.size() > 0){
+                    mChatRecyclerAdapter = new ChatRecyclerAdapter(mContext, mMessagesList);
+                    mRecyclerView.setAdapter(mChatRecyclerAdapter);
+                    emptyList.setVisibility(View.INVISIBLE);
+                }else {
+                    emptyList.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
@@ -217,7 +225,9 @@ public class ChatFragment extends BottomSheetDialogFragment{
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             getMessages();
-            mChatRecyclerAdapter.notifyDataSetChanged();
+            if (mMessagesList.size() > 0){
+                mChatRecyclerAdapter.notifyDataSetChanged();
+            }
         }
 
         @Override

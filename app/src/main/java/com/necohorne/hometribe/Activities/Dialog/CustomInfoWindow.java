@@ -19,6 +19,7 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
     public CustomInfoWindow(Context context) {
         CustomInfoWindow.this.context = context;
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         view = layoutInflater.inflate(R.layout.activity_custom_info_window, null);
     }
     @Override
@@ -35,7 +36,7 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         TextView distanceFromHome = (TextView) view.findViewById( R.id.distanceFromHomeId );
         distanceFromHome.setText(marker.getSnippet());
 
-        Button moreBtn = (Button) view.findViewById(R.id.btn );
+        TextView moreBtn = (TextView) view.findViewById(R.id.more_info );
 
         return view;
     }

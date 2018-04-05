@@ -5,59 +5,73 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/alert_dialog_background_2"
     android:padding="10dp"
     tools:context="com.necohorne.hometribe.Activities.Dialog.HomePromptSetup">
 
-    <TextView
-        android:id="@+id/home_prompt_title"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/alert"
-        android:textAllCaps="true"
-        android:textColor="@android:color/holo_red_dark"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:cardCornerRadius="10dp"
+        tools:layout_editor_absoluteX="10dp"
+        tools:layout_editor_absoluteY="10dp">
 
-    <TextView
-        android:id="@+id/home_prompt_text"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:background="@color/White"
-        android:padding="5dp"
-        android:text="@string/alert_home_prompt"
-        android:textAlignment="center"
-        android:textSize="17sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_prompt_title"
-        app:layout_constraintVertical_bias="0.166" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="5dp">
 
-    <TextView
-        android:id="@+id/home_prompt_set"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Set Home Location"
-        android:textAllCaps="true"
-        android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.842"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/home_prompt_text" />
+            <TextView
+                android:id="@+id/home_prompt_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/home_prompt_title"
+                android:layout_centerHorizontal="true"
+                android:background="@color/White"
+                android:padding="5dp"
+                android:text="@string/alert_home_prompt"
+                android:textAlignment="center"
+                android:textSize="17sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_prompt_title"
+                app:layout_constraintVertical_bias="0.166" />
+
+            <TextView
+                android:id="@+id/home_prompt_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:padding="5dp"
+                android:text="@string/alert"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/home_prompt_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/home_prompt_text"
+                android:layout_centerHorizontal="true"
+                android:padding="5dp"
+                android:text="Set Home Location"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.842"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_prompt_text" />
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
 </android.support.constraint.ConstraintLayout>

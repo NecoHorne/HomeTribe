@@ -1,6 +1,9 @@
 package com.necohorne.hometribe.Activities.AppActivities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -45,6 +48,9 @@ import com.necohorne.hometribe.R;
 
 import io.fabric.sdk.android.Fabric;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 
 import static android.text.TextUtils.isEmpty;
@@ -57,12 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     public static boolean isActivityRunning;
 
     //------------UI WIDGETS------------//
-    private EditText email;
-    private EditText password;
-    private Button loginButton;
-    private TextView registerNewAccount;
-    private TextView forgotPassword;
-    private TextView resendVerification;
+    private Button emailButton;
 
     //------------FIREBASE LOGIN------------//
     private FirebaseAuth mAuth;
@@ -90,17 +91,17 @@ public class LoginActivity extends AppCompatActivity {
                 .requestIdToken(getString( R.string.google_auth_token_android))
                 .requestEmail()
                 .build();
-
+        emailButton = (Button) findViewById( R.id.login_activity_email_button);
+        emailButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity( new Intent(LoginActivity.this, EmailLoginActivity.class));
+            }
+        } );
         mLoggedInIntent = new Intent( LoginActivity.this, MainActivity.class );
-
         mAuth = FirebaseAuth.getInstance();
-
         setupFirebaseAuth();
-
-        emailLoginSetup();
-
         FacebookLogin();
-
         googleLogin();
 
     }
@@ -151,88 +152,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-    }
-
-    //------------LOGIN SETUP------------//
-    private void emailLoginSetup(){
-
-        email = (EditText) findViewById(R.id.login_activity_email_edit_text);
-        password = (EditText) findViewById( R.id.login_activity_password_edit_text);
-        loginButton = (Button) findViewById( R.id.login_activity_login_button);
-        loginButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                emailLogin();
-            }
-        } );
-
-        registerNewAccount = (TextView) findViewById( R.id.login_activity_register_new );
-        registerNewAccount.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createNewAccount();
-            }
-        } );
-
-        forgotPassword = (TextView) findViewById( R.id.login_forgot_password );
-        forgotPassword.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                forgotPass();
-            }
-        } );
-
-        resendVerification = (TextView) findViewById( R.id.login_resend_verification);
-        resendVerification.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resendVerEmail();
-            }
-        } );
-
-        mAuth = FirebaseAuth.getInstance();
-
-    }
-
-    private void forgotPass() {
-        ResetPasswordDialog dialog = new ResetPasswordDialog();
-        dialog.show( getFragmentManager(),"activity_reset_password");
-    }
-
-    private void resendVerEmail() {
-        ResendVerificationDialog dialog = new ResendVerificationDialog();
-        dialog.show( getFragmentManager(), "activity_resend_verification_dialog" );
-    }
-
-    private void createNewAccount() {
-        Intent newAccountIntent = new Intent(LoginActivity.this, RegisterNewAccount.class);
-        startActivity(newAccountIntent);
-    }
-
-    private void emailLogin() {
-        //showDialog
-
-        if (!isEmpty(email.getText().toString())
-                && !isEmpty( password.getText().toString())){
-            Log.d( TAG, "Attempting to Authenticate" );
-
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email.getText().toString(), password.getText().toString()).addOnCompleteListener( new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    //hideDialog
-                }
-            }).addOnFailureListener( new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText( LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                    //hideDialog
-                }
-            } );
-
-        } else {
-            Toast.makeText( LoginActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-        }
-
     }
 
     private void FacebookLogin(){

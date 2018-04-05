@@ -614,8 +614,8 @@ public class UserProfileActivity extends AppCompatActivity implements
         MobileAds.initialize( UserProfileActivity.this, addMobAppId);
         mAdView = (AdView) findViewById( R.id.ad_view_user);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
                 .build();
         mAdView.loadAd(adRequest);
     }

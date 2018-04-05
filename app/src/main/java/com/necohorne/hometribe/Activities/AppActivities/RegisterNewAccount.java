@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,6 +35,7 @@ public class RegisterNewAccount extends AppCompatActivity {
     private EditText mConfirmPassword;
     private Button createNewAccountButton;
     private FirebaseAuth mAuth;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,7 @@ public class RegisterNewAccount extends AppCompatActivity {
         mEmail = (EditText) findViewById( R.id.register_account_email);
         mPassword = (EditText) findViewById( R.id.register_account_password);
         mConfirmPassword = (EditText) findViewById( R.id.register_account_password_confirm);
+        mProgressBar = (ProgressBar) findViewById( R.id.create_account_progressbar);
     }
 
     private void createAccount() {
@@ -92,7 +95,7 @@ public class RegisterNewAccount extends AppCompatActivity {
                 && !isEmpty( mConfirmPassword.getText().toString())){
             //check if passwords match
             if ((mPassword.getText().toString()).equals(mConfirmPassword.getText().toString())){
-
+                mProgressBar.setVisibility( View.VISIBLE );
                 mAuth.createUserWithEmailAndPassword( mEmail.getText().toString(), mPassword.getText().toString()).addOnCompleteListener(
                         new OnCompleteListener<AuthResult>() {
                             @Override
@@ -103,9 +106,11 @@ public class RegisterNewAccount extends AppCompatActivity {
                                     updateDisplayName(mDisplayName.getText().toString());
                                     sendVerificationEmail();
                                     FirebaseAuth.getInstance().signOut();
-                                    startActivity( new Intent( RegisterNewAccount.this, LoginActivity.class));
+                                    mProgressBar.setVisibility( View.INVISIBLE );
+                                    startActivity( new Intent( RegisterNewAccount.this, EmailLoginActivity.class));
                                     finish();
                                 }else {
+                                    mProgressBar.setVisibility( View.INVISIBLE );
                                     Toast.makeText( RegisterNewAccount.this, "Account Creation Unsuccessful", Toast.LENGTH_LONG).show();
                                 }
                             }

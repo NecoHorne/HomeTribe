@@ -10,9 +10,7 @@
         android:id="@+id/t_and_c_accept_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/accent_border"
         android:text="Accept"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -53,8 +51,8 @@
 
             <WebView
                 android:id="@+id/t_and_c_webview"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 </android.support.constraint.ConstraintLayout>

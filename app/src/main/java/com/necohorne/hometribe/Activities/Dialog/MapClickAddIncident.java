@@ -57,15 +57,12 @@ public class MapClickAddIncident extends DialogFragment {
     private Context mContext;
     private FirebaseAuth mAuth;
     private Spinner mIncidentSpinner;
-    private Spinner mProvinceSpinner;
     private EditText mDescription;
     private EditText mPoliceNumber;
-    private String mChosenProvince;
     private String mSpecifiedIncident;
     private DatabaseReference mDatabase;
     private TextView date;
     private TextView time;
-    private TextView location;
     private LatLng incidentPlace;
 
     private int mMinute;
@@ -88,6 +85,7 @@ public class MapClickAddIncident extends DialogFragment {
         setupDataBase();
         setupUi();
         Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MINUTE, 1);
         mToday = calendar.getTime();
         return mView;
     }
@@ -101,8 +99,6 @@ public class MapClickAddIncident extends DialogFragment {
 
         mIncidentSpinner = (Spinner) mView.findViewById(R.id.map_add_incident_spinner );
         incidentSpinnerUI();
-        mProvinceSpinner = (Spinner) mView.findViewById(R.id.map_add_incident_province_spinner);
-        provinceSpinnerUI();
 
         date = (TextView) mView.findViewById( R.id.map_add_alert_date );
         date.setOnClickListener( new View.OnClickListener() {
@@ -120,17 +116,17 @@ public class MapClickAddIncident extends DialogFragment {
 
             }
         } );
-        location = (TextView) mView.findViewById(R.id.map_add_incident_place);
-        location.setText(getLocation());
+
+        getLocation();
 
         mDescription = (EditText) mView.findViewById(R.id.map_add_report_incident_description);
         mPoliceNumber = (EditText) mView.findViewById(R.id.map_add_report_incident_cas_number);
 
         initAds();
 
-        Button submitBotton = (Button) mView.findViewById(R.id.map_add_report_incident_submit_button );
+        Button submitButton = (Button) mView.findViewById(R.id.map_add_report_incident_submit_button );
 
-        submitBotton.setOnClickListener(new View.OnClickListener() {
+        submitButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     setupIncidentObject();
@@ -139,7 +135,7 @@ public class MapClickAddIncident extends DialogFragment {
         );
     }
 
-    private String getLocation(){
+    private void getLocation(){
         String location = getArguments().getString("map_click_location");
         String sub = location.substring(9);
         String str1 = sub.replaceAll("[(]", "" );
@@ -148,7 +144,6 @@ public class MapClickAddIncident extends DialogFragment {
         double latitude = Double.parseDouble(latLong[0]);
         double longitude = Double.parseDouble(latLong[1]);
         incidentPlace = new LatLng(latitude, longitude);
-        return new String(latitude + " , " + longitude);
     }
 
     private void incidentSpinnerUI(){
@@ -161,22 +156,6 @@ public class MapClickAddIncident extends DialogFragment {
                 mSpecifiedIncident = mIncidentSpinner.getSelectedItem().toString();
             }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        } );
-    }
-
-    private void provinceSpinnerUI(){
-        ArrayAdapter<CharSequence> provinceAdapter = ArrayAdapter.createFromResource( mContext, R.array.provinces_array, R.layout.spinner_item );
-        provinceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mProvinceSpinner.setAdapter( provinceAdapter );
-        mProvinceSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mChosenProvince = mProvinceSpinner.getSelectedItem().toString();
-            }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
@@ -294,7 +273,7 @@ public class MapClickAddIncident extends DialogFragment {
                 incident.setCountry(locale);
 
                 //IncidentCrime state_province
-                incident.setState_province(mChosenProvince);
+                //todo
 
                 //IncidentCrime Town
                 Geocoder geocoder = new Geocoder( getApplicationContext(), Locale.getDefault() );
@@ -363,7 +342,6 @@ public class MapClickAddIncident extends DialogFragment {
         mInterstitialAd = new InterstitialAd(mContext);
         mInterstitialAd.setAdUnitId(addIncidentAd);
         mInterstitialAd.loadAd(new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build());
     }
 

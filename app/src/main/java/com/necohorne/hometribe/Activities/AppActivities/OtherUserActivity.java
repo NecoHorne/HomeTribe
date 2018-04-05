@@ -337,7 +337,7 @@ public class OtherUserActivity extends AppCompatActivity {
         mAdView = (AdView) findViewById( R.id.ad_view_other_user);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
+//                .addTestDevice("4926DE19847C7207CFD6EE240D57FD37")
                 .build();
         mAdView.loadAd(adRequest);
     }

@@ -1,14 +1,13 @@
 package com.necohorne.hometribe.Activities.Dialog;
 
-import android.app.Dialog;
+import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,13 +22,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.necohorne.hometribe.R;
+import com.necohorne.hometribe.Utilities.MyDialogCloseListener;
 
-import static android.app.PendingIntent.getActivity;
 import static android.text.TextUtils.isEmpty;
 
 public class ResendVerificationDialog extends DialogFragment {
@@ -48,7 +46,8 @@ public class ResendVerificationDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate( R.layout.activity_resend_verification_dialog, container, false);
+        mView = inflater.inflate(R.layout.activity_resend_verification_dialog, container, false);
+        mContext = getActivity();
 
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
 
@@ -58,7 +57,6 @@ public class ResendVerificationDialog extends DialogFragment {
     }
 
     private void setupUI(){
-        mContext = getActivity();
         mEmail = (EditText) mView.findViewById( R.id.resend_verification_email );
         mPassword = (EditText) mView.findViewById( R.id.resend_verification_password);
         mCancel = (TextView) mView.findViewById(R.id.dialog_cancel);
@@ -92,7 +90,9 @@ public class ResendVerificationDialog extends DialogFragment {
 
     private void authenticateAndResend(String email, String password){
         AuthCredential credential = EmailAuthProvider.getCredential(email, password);
-        FirebaseAuth.getInstance().signInWithCredential( credential).addOnCompleteListener( new OnCompleteListener<AuthResult>() {
+        FirebaseAuth.getInstance()
+                .signInWithCredential( credential)
+                .addOnCompleteListener( new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
@@ -129,5 +129,11 @@ public class ResendVerificationDialog extends DialogFragment {
                         }
                     });
         }
+    }
+
+    public void onDismiss(DialogInterface dialog) {
+        Activity activity = getActivity();
+        if(activity instanceof MyDialogCloseListener)
+            ((MyDialogCloseListener)activity).handleDialogClose(dialog);
     }
 }

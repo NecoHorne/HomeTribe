@@ -27,6 +27,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -106,8 +107,12 @@ import java.util.concurrent.TimeUnit;
 import static com.google.maps.android.SphericalUtil.computeDistanceBetween;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback,
-        GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        OnMapReadyCallback,
+        GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnMyLocationClickListener,
+        GoogleMap.OnMyLocationButtonClickListener{
 
     private static final String TAG = "MainActivity";
     private static final float DEFAULT_OUTLINE_WIDTH_DP = 30;
@@ -143,28 +148,28 @@ public class MainActivity extends AppCompatActivity
     //------------BOTTOM MENU BAR------------//
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.bottom_nav_home:
-                    goHome();
-                    return true;
-                case R.id.bottom_nav_chat:
-                    openChatWindow();
-                    return true;
-                case R.id.bottom_nav_incident:
-                    addIncidentDialog();
-                    return true;
-            }
-            return false;
-        }
-    };
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.bottom_nav_home:
+                            goHome();
+                            return true;
+                        case R.id.bottom_nav_chat:
+                            openChatWindow();
+                            return true;
+                        case R.id.bottom_nav_incident:
+                            addIncidentDialog();
+                            return true;
+                    }
+                    return false;
+                }
+            };
 
     //------------ACTIVITY LIFECYCLE------------//
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState );
-        setContentView(R.layout.activity_main);
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_main );
 
         //login
         mAuth = FirebaseAuth.getInstance();
@@ -181,11 +186,11 @@ public class MainActivity extends AppCompatActivity
         today();
 
         //Maps
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapView);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById( R.id.mapView );
         mapFragment.getMapAsync( MainActivity.this );
 
         setupDatabase();
-        mLogOutIntent = new Intent(MainActivity.this, LoginActivity.class);
+        mLogOutIntent = new Intent( MainActivity.this, LoginActivity.class );
         displayMetrics();
 
         addMobSetup();
@@ -194,6 +199,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         isActivityRunning = true;
+        checkAuthenticationState();
         super.onStart();
     }
 
@@ -234,43 +240,43 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void redrawMap(){
+    private void redrawMap() {
         settingsPrefsSetUp();
         mMap.clear();
-        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle()));
+        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle() ) );
         if (!success) {
-            Log.e(TAG, "Style parsing failed.");
+            Log.e( TAG, "Style parsing failed." );
         }
         setUpLocation();
         homeLocation();
         getIncidentLocations();
     }
 
-    public void addIncidentDialog(){
-        if (mIncidentDialog != null){
-            mIncidentDialog.setInitialSavedState(null);
+    public void addIncidentDialog() {
+        if (mIncidentDialog != null) {
+            mIncidentDialog.setInitialSavedState( null );
             mIncidentDialog = null;
         }
         mIncidentDialog = new AddIncidentDialog();
-        mIncidentDialog.show(getFragmentManager(), "activity_add_incident_dialog");
+        mIncidentDialog.show( getFragmentManager(), "activity_add_incident_dialog" );
     }
 
-    public void openChatWindow(){
-        if (prefBool){
+    public void openChatWindow() {
+        if (prefBool) {
             Bundle args = new Bundle();
-            args.putString(getString(R.string.bundle_home), mHome.getLocation().toString());
+            args.putString( getString( R.string.bundle_home ), mHome.getLocation().toString() );
             ChatFragment bottomSheetFragment = new ChatFragment();
-            bottomSheetFragment.setArguments(args);
-            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+            bottomSheetFragment.setArguments( args );
+            bottomSheetFragment.show( getSupportFragmentManager(), bottomSheetFragment.getTag() );
         } else {
-            Toast.makeText(MainActivity.this, "Please set Home Location to enable chat", Toast.LENGTH_SHORT).show();
+            Toast.makeText( MainActivity.this, "Please set Home Location to enable chat", Toast.LENGTH_SHORT ).show();
         }
     }
 
-    public void goHome(){
-        if (prefBool){
+    public void goHome() {
+        if (prefBool) {
             homeLocation();
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
+            mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15 ) );
             Toast.makeText( MainActivity.this, "Home", Toast.LENGTH_SHORT ).show();
         } else {
             Toast.makeText( MainActivity.this, "Please set Home Location to enable this function", Toast.LENGTH_SHORT ).show();
@@ -291,20 +297,20 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.action_settings:
-                startActivity(new Intent( this, SettingsActivity.class ));
+                startActivity( new Intent( this, SettingsActivity.class ) );
                 break;
         }
         return super.onOptionsItemSelected( item );
     }
 
-    private void settingsPrefsSetUp(){
-        PreferenceManager.setDefaultValues(this,R.xml.pref_general,false);
-        PreferenceManager.setDefaultValues(this,R.xml.pref_notification,false);
-        PreferenceManager.setDefaultValues(this,R.xml.pref_data_sync,false);
-        PreferenceManager.setDefaultValues(this,R.xml.pref_incidents,false);
+    private void settingsPrefsSetUp() {
+        PreferenceManager.setDefaultValues( this, R.xml.pref_general, false );
+        PreferenceManager.setDefaultValues( this, R.xml.pref_notification, false );
+        PreferenceManager.setDefaultValues( this, R.xml.pref_data_sync, false );
+        PreferenceManager.setDefaultValues( this, R.xml.pref_incidents, false );
     }
 
-    private void settingsSetup(){
+    private void settingsSetup() {
         Toolbar toolbar = (Toolbar) findViewById( R.id.toolbar );
         setSupportActionBar( toolbar );
 
@@ -320,14 +326,15 @@ public class MainActivity extends AppCompatActivity
         BottomNavigationView navigation = (BottomNavigationView) findViewById( R.id.bottom_nav_bar );
         navigation.setOnNavigationItemSelectedListener( mOnNavigationItemSelectedListener );
 
-        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById( R.id.gps_location_fab);
+        FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById( R.id.gps_location_fab );
         floatingActionButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                currentLocation(mCurrentLocation);
-                Toast.makeText( MainActivity.this, "Current Location", Toast.LENGTH_LONG).show();
+                currentLocation( mCurrentLocation );
+                Toast.makeText( MainActivity.this, "Current Location", Toast.LENGTH_LONG ).show();
             }
         } );
+        floatingActionButton.setVisibility( View.INVISIBLE );
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -337,26 +344,26 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_profile:
-                startActivity(new Intent(MainActivity.this, UserProfileActivity.class));
+                startActivity( new Intent( MainActivity.this, UserProfileActivity.class ) );
                 break;
             case R.id.nav_home:
-                Intent homeIntent = new Intent( MainActivity.this, HomeActivity.class);
-                startActivity(homeIntent);
+                Intent homeIntent = new Intent( MainActivity.this, HomeActivity.class );
+                startActivity( homeIntent );
                 break;
             case R.id.nav_stats:
                 Intent statsIntent = new Intent( MainActivity.this, HomeStatsActivity.class );
-                startActivity(statsIntent);
+                startActivity( statsIntent );
                 break;
             case R.id.nav_friends:
-                Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class);
-                startActivity(neighbourIntent);
+                Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class );
+                startActivity( neighbourIntent );
                 break;
             case R.id.nav_share:
                 shareInvite();
                 break;
             case R.id.nav_about:
-                Intent aboutIntent = new Intent( MainActivity.this, AboutActivity.class);
-                startActivity(aboutIntent);
+                Intent aboutIntent = new Intent( MainActivity.this, AboutActivity.class );
+                startActivity( aboutIntent );
                 break;
             case R.id.nav_log_out:
                 logOut();
@@ -368,9 +375,9 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public void getPrefs(){
-        mHomePrefs = getSharedPreferences(Constants.PREFS_HOME, 0);
-        prefBool = mHomePrefs.contains(Constants.HOME);
+    public void getPrefs() {
+        mHomePrefs = getSharedPreferences( Constants.PREFS_HOME, 0 );
+        prefBool = mHomePrefs.contains( Constants.HOME );
         mHomePrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -382,87 +389,88 @@ public class MainActivity extends AppCompatActivity
     //------------PROFILE / LOGIN------------//
     private void logOut() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null){
+        if (user != null) {
             FirebaseAuth.getInstance().signOut();
-            Toast.makeText( MainActivity.this, "Successfully logged out", Toast.LENGTH_LONG).show();
-            startActivity(mLogOutIntent);
+            Toast.makeText( MainActivity.this, "Successfully logged out", Toast.LENGTH_LONG ).show();
+            startActivity( mLogOutIntent );
             finish();
         }
     }
 
-    private void updateUserProfile(){
+    private void updateUserProfile() {
 
         NavigationView navigationView = (NavigationView) findViewById( R.id.nav_view );
-        View headerView = navigationView.getHeaderView(0);
+        View headerView = navigationView.getHeaderView( 0 );
         final ImageView profilePicture = (ImageView) headerView.findViewById( R.id.nav_profile_image );
         final TextView userName = (TextView) headerView.findViewById( R.id.nav_profile_name );
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        String provider = user.getProviders().toString();
 
-        if (user != null){
-            if (provider.equals("[password]")) {
+        if (user != null) {
+            String provider = user.getProviders().toString();
+            if (provider.equals( "[password]" )) {
                 mName = user.getDisplayName();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-                Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid());
-                Log.d( TAG, "Marker Query: "+ query);
+                Query query = userRef.child( getString( R.string.dbnode_user ) ).child( user.getUid() );
+                Log.d( TAG, "Marker Query: " + query );
                 query.addListenerForSingleValueEvent( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.exists()){
+                        if (dataSnapshot.exists()) {
                             Log.d( TAG, "Marker Datasnapshot" );
                             Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
                             try {
                                 String url = (String) objectMap.get( "profile_image" );
-                                if (!url.equals("content://com.android.providers.media.documents/document/image%3A45")
-                                        && !url.equals("null")){
-                                    mPhotoUrl = Uri.parse(url);
-                                    Picasso.with(MainActivity.this)
-                                            .load(mPhotoUrl)
+                                if (!url.equals( "content://com.android.providers.media.documents/document/image%3A45" )
+                                        && !url.equals( "null" )) {
+                                    mPhotoUrl = Uri.parse( url );
+                                    Picasso.with( MainActivity.this )
+                                            .load( mPhotoUrl )
                                             .into( profilePicture );
-                                    userName.setText(mName);
-                                }else {
-                                    Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
-                                    profilePicture.setImageBitmap(bitmap);
-                                    userName.setText(mName);
+                                    userName.setText( mName );
+                                } else {
+                                    Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon );
+                                    profilePicture.setImageBitmap( bitmap );
+                                    userName.setText( mName );
                                 }
-                            }catch (NullPointerException e){
-                                Log.d( TAG, "no profile picture set " + e.toString());
-                                Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon);
-                                profilePicture.setImageBitmap(bitmap);
-                                userName.setText(mName);
+                            } catch (NullPointerException e) {
+                                Log.d( TAG, "no profile picture set " + e.toString() );
+                                Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon );
+                                profilePicture.setImageBitmap( bitmap );
+                                userName.setText( mName );
                             }
                         }
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
                 } );
-            }else if (provider.equals( "[facebook.com]" )) {
+            } else if (provider.equals( "[facebook.com]" )) {
                 for (UserInfo profile : user.getProviderData()) {
                     String facebookUserId = "";
                     mName = profile.getDisplayName();
                     mPhotoUrl = profile.getPhotoUrl();
-                    if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                    if (FacebookAuthProvider.PROVIDER_ID.equals( profile.getProviderId() )) {
                         facebookUserId = profile.getUid();
                         String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-                        mPhotoUrl = Uri.parse(photoUrl);
+                        mPhotoUrl = Uri.parse( photoUrl );
                     }
                 }
-            }else if (provider.equals( "[google.com]" )){
+            } else if (provider.equals( "[google.com]" )) {
                 for (UserInfo profile : user.getProviderData()) {
                     mName = profile.getDisplayName();
                     mPhotoUrl = profile.getPhotoUrl();
                 }
-        }
-            Picasso.with(MainActivity.this)
-                    .load(mPhotoUrl)
+            }
+            Picasso.with( MainActivity.this )
+                    .load( mPhotoUrl )
                     .into( profilePicture );
-            userName.setText(mName);
+            userName.setText( mName );
         }
     }
 
-    private UserProfile createUser(){
+    private UserProfile createUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String provider = user.getProviders().toString();
         final String token = FirebaseInstanceId.getInstance().getToken();
@@ -471,62 +479,62 @@ public class MainActivity extends AppCompatActivity
         String google = "[google.com]";
         UserProfile newUser = new UserProfile();
 
-        if (user != null){
-            if (provider.equals(firebase)) {
-                newUser.setUser_name(user.getDisplayName());
-                newUser.setUser_email(user.getEmail());
+        if (user != null) {
+            if (provider.equals( firebase )) {
+                newUser.setUser_name( user.getDisplayName() );
+                newUser.setUser_email( user.getEmail() );
                 newUser.setProfile_image( String.valueOf( user.getPhotoUrl() ) );
-                newUser.setUser_id(user.getUid());
-                if (user.getPhoneNumber() != null){
-                    newUser.setPhone_number(user.getPhoneNumber());
+                newUser.setUser_id( user.getUid() );
+                if (user.getPhoneNumber() != null) {
+                    newUser.setPhone_number( user.getPhoneNumber() );
                 }
-                if (prefBool){
-                    newUser.setHome_location(mHome.getLocation());
+                if (prefBool) {
+                    newUser.setHome_location( mHome.getLocation() );
                 }
-                newUser.setFcm_token(token);
-            }else if (provider.equals(facebook)) {
+                newUser.setFcm_token( token );
+            } else if (provider.equals( facebook )) {
                 for (UserInfo profile : user.getProviderData()) {
                     String facebookUserId = "";
-                    newUser.setUser_id(user.getUid());
-                    newUser.setUser_name(profile.getDisplayName());
-                    newUser.setUser_email(profile.getEmail());
-                    newUser.setUser_id(user.getUid());
-                    newUser.setFcm_token(token);
-                    if(FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
+                    newUser.setUser_id( user.getUid() );
+                    newUser.setUser_name( profile.getDisplayName() );
+                    newUser.setUser_email( profile.getEmail() );
+                    newUser.setUser_id( user.getUid() );
+                    newUser.setFcm_token( token );
+                    if (FacebookAuthProvider.PROVIDER_ID.equals( profile.getProviderId() )) {
                         facebookUserId = profile.getUid();
                         String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
-                        newUser.setProfile_image( String.valueOf( Uri.parse(photoUrl) ) );
-                        if (profile.getPhoneNumber() != null){
-                            newUser.setPhone_number(profile.getPhoneNumber());
+                        newUser.setProfile_image( String.valueOf( Uri.parse( photoUrl ) ) );
+                        if (profile.getPhoneNumber() != null) {
+                            newUser.setPhone_number( profile.getPhoneNumber() );
                         }
-                        if (prefBool){
-                            newUser.setHome_location(mHome.getLocation());
+                        if (prefBool) {
+                            newUser.setHome_location( mHome.getLocation() );
                         }
                     }
                 }
-            }else if (provider.equals(google)){
+            } else if (provider.equals( google )) {
                 for (UserInfo profile : user.getProviderData()) {
-                    newUser.setUser_id(profile.getUid());
-                    newUser.setUser_name(profile.getDisplayName());
-                    newUser.setUser_email(profile.getEmail());
+                    newUser.setUser_id( profile.getUid() );
+                    newUser.setUser_name( profile.getDisplayName() );
+                    newUser.setUser_email( profile.getEmail() );
                     newUser.setProfile_image( String.valueOf( profile.getPhotoUrl() ) );
-                    newUser.setUser_id(user.getUid());
-                    newUser.setFcm_token(token);
-                    if (profile.getPhoneNumber() != null){
-                        newUser.setPhone_number(profile.getPhoneNumber());
+                    newUser.setUser_id( user.getUid() );
+                    newUser.setFcm_token( token );
+                    if (profile.getPhoneNumber() != null) {
+                        newUser.setPhone_number( profile.getPhoneNumber() );
                     }
-                    if (prefBool){
-                        newUser.setHome_location( mHome.getLocation());
+                    if (prefBool) {
+                        newUser.setHome_location( mHome.getLocation() );
                     }
                 }
-            }else {
+            } else {
                 Log.d( TAG, "Unable to create user." );
             }
         }
         return newUser;
     }
 
-    private void setupDatabase(){
+    private void setupDatabase() {
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -539,46 +547,47 @@ public class MainActivity extends AppCompatActivity
             }
         };
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mDatabaseReference.addValueEventListener(postListener);
+        mDatabaseReference.addValueEventListener( postListener );
 
     }
 
-    private void uploadUser(){
+    private void uploadUser() {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String userId = user.getUid();
         mUserProfile = createUser();
         mDatabaseReference = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(getString(R.string.dbnode_user))
-                .child(mUserProfile.getUser_id());
-        Query query = mDatabaseReference.orderByChild(mUserProfile.getUser_id());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+                .child( getString( R.string.dbnode_user ) )
+                .child( mUserProfile.getUser_id() );
+        Query query = mDatabaseReference.orderByChild( mUserProfile.getUser_id() );
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()){
-                    mDatabaseReference.setValue(mUserProfile);
-                }else {
+                if (!dataSnapshot.exists()) {
+                    mDatabaseReference.setValue( mUserProfile );
+                } else {
                     Log.d( TAG, "uploadUser, Key Exists, User not uploaded" );
                     Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
                     try {
-                        String uid = objectMap.get("user_id").toString();
-                    } catch (NullPointerException e){
-                        mDatabaseReference.setValue( mUserProfile);
+                        String uid = objectMap.get( "user_id" ).toString();
+                    } catch (NullPointerException e) {
+                        mDatabaseReference.setValue( mUserProfile );
                     }
                     checkAndLogFCMToken();
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         } );
     }
 
-    private void checkAuthenticationState(){
+    private void checkAuthenticationState() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null){
-            mLogOutIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity( mLogOutIntent);
+        if (user == null) {
+            mLogOutIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK );
+            startActivity( mLogOutIntent );
             finish();
         }
     }
@@ -590,26 +599,27 @@ public class MainActivity extends AppCompatActivity
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final String token = FirebaseInstanceId.getInstance().getToken();
         final DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-        Query query = userRef.child(getString(R.string.dbnode_user)).child(user.getUid()).child("fcm_token");
+        Query query = userRef.child( getString( R.string.dbnode_user ) ).child( user.getUid() ).child( "fcm_token" );
         query.addListenerForSingleValueEvent( new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     // check if current key matches online key. if not write the new one
-                    if (!dataSnapshot.equals(token)){
-                        userRef.child(getString(R.string.dbnode_user))
-                                .child(user.getUid())
-                                .child("fcm_token")
-                                .setValue(token);
+                    if (!dataSnapshot.equals( token )) {
+                        userRef.child( getString( R.string.dbnode_user ) )
+                                .child( user.getUid() )
+                                .child( "fcm_token" )
+                                .setValue( token );
                     }
-                }else {
+                } else {
                     //token does not exist, write new one to user.
-                    userRef.child(getString(R.string.dbnode_user))
-                            .child(user.getUid())
-                            .child("fcm_token")
-                            .setValue(token);
+                    userRef.child( getString( R.string.dbnode_user ) )
+                            .child( user.getUid() )
+                            .child( "fcm_token" )
+                            .setValue( token );
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -617,10 +627,10 @@ public class MainActivity extends AppCompatActivity
         } );
     }
 
-    private void homePromptDialog(){
-        if (!prefBool){
+    private void homePromptDialog() {
+        if (!prefBool) {
             HomePromptSetup dialog = new HomePromptSetup();
-            dialog.show(getFragmentManager(),"fragment_home_prompt");
+            dialog.show( getFragmentManager(), "fragment_home_prompt" );
         }
     }
 
@@ -628,25 +638,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType( GoogleMap.MAP_TYPE_NORMAL);
-        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle()));
+        mMap.setMapType( GoogleMap.MAP_TYPE_NORMAL );
+        boolean success = mMap.setMapStyle( MapStyleOptions.loadRawResourceStyle( getApplicationContext(), getMapStyle() ) );
         if (!success) {
-            Log.e(TAG, "Style parsing failed.");
+            Log.e( TAG, "Style parsing failed." );
         }
         setUpLocation();
         getIncidentLocations();
-        mMap.setInfoWindowAdapter(new CustomInfoWindow(getApplicationContext()));
-        mMap.setOnInfoWindowClickListener(MainActivity.this);
-        mMap.setOnMarkerClickListener(MainActivity.this);
+        mMap.setInfoWindowAdapter( new CustomInfoWindow( MainActivity.this ) );
+        mMap.setOnInfoWindowClickListener( MainActivity.this );
+        mMap.setOnMarkerClickListener( MainActivity.this );
 
-        mHomePrefs.registerOnSharedPreferenceChangeListener( new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                homeLocation();
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom( mHomeLatLng, 15));
-                getIncidentLocations();
-            }
-        } );
+        mMap.setPadding( 0, 200, 0, 200 );
+        if (ContextCompat.checkSelfPermission( this, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        } else {
+            mMap.setMyLocationEnabled( true );
+        }
 
         mapClickAddIncident();
 
@@ -933,6 +941,16 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+
+    }
+
     private void mapClickAddIncident(){
 
         //add an incident by long clicking on the map.
@@ -1008,30 +1026,38 @@ public class MainActivity extends AppCompatActivity
             query.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+
                     for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()){
                         IncidentCrime incident = new IncidentCrime();
                         Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
 
-                        incident.setIncident_type(objectMap.get(getString(R.string.field_incident_type)).toString());
+                        incident.setIncident_location(getLocation(objectMap.get(getString(R.string.field_incident_location)).toString()));
+                        incident.setIncident_date(objectMap.get(getString( R.string.field_incident_date)).toString());
 
-                        String date = objectMap.get(getString( R.string.field_incident_date)).toString();
-                        incident.setIncident_date(date);
+                        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        int distanceFromHomePref = Integer.parseInt( pref.getString("prefs_distance_from_home", "5") );
+                        int incidentTimePref = Integer.parseInt( pref.getString("prefs_time_home", "31") );
+                        double distanceFromHome = checkDistance(incident);
+                        today();
+                        if (incident.getIncident_location() != null){
+                            if (incident.getIncident_date() != null){
+                                long days = getDateDiff(convertDate(incident).getTime(), mToday, TimeUnit.DAYS);
+                                if (days <= incidentTimePref){
+                                    if (distanceFromHome <= distanceFromHomePref){
+                                        incident.setIncident_type(objectMap.get(getString(R.string.field_incident_type)).toString());
+                                        incident.setCountry(objectMap.get(getString(R.string.field_incident_type)).toString());
+                                        incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
+                                        incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
+                                        incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
+                                        incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
+                                        incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
+                                        incident.setReference(singleSnapshot.getKey());
 
-                        incident.setCountry(objectMap.get(getString(R.string.field_incident_type)).toString());
-                        incident.setState_province(objectMap.get(getString(R.string.field_state_province)).toString());
-                        incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
-                        incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
-
-                        String sLocation = (objectMap.get(getString(R.string.field_incident_location)).toString());
-                        incident.setIncident_location(getLocation(sLocation));
-
-                        incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
-                        incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
-                        incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
-
-                        incident.setReference(singleSnapshot.getKey());
-
-                        setUpIncidentMarkers(incident);
+                                        setUpIncidentMarkers(incident);
+                                    }
+                                }
+                            }
+                        }
                     }
                     homeLocation();
                 }
@@ -1056,32 +1082,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setUpIncidentMarkers(IncidentCrime incident) {
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        int distanceFromHomePref = Integer.parseInt( pref.getString("prefs_distance_from_home", "5") );
-        int incidentTimePref = Integer.parseInt( pref.getString("prefs_time_home", "31") );
         double distanceFromHome = checkDistance(incident);
         double dfromHFormat = distanceFormatting(distanceFromHome);
-        today();
-        if (incident.getIncident_location() != null){
-            if (incident.getIncident_date() != null){
-                long days = getDateDiff(convertDate(incident).getTime(), mToday, TimeUnit.DAYS);
-                if (days <= incidentTimePref){
-                    if (distanceFromHome <= distanceFromHomePref){
-                        LatLng location = incident.getIncident_location();
-                        Bitmap catMarker = markerType(incident);
-                        MarkerOptions markerOptions = new MarkerOptions();
-                        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(catMarker));
-                        markerOptions.title(incident.getIncident_type());
-                        markerOptions.position(location);
-                        markerOptions.snippet(dfromHFormat + "Km Away" + "\n" +
-                        "Incident Date: " + incident.getIncident_date());
-                        Marker marker = mMap.addMarker(markerOptions);
-                        marker.setTag(incident);
-                    }
-                }
-            }
-        }
-
+        LatLng location = incident.getIncident_location();
+        Bitmap catMarker = markerType(incident);
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(catMarker));
+        markerOptions.title(incident.getIncident_type());
+        markerOptions.position(location);
+        markerOptions.snippet(dfromHFormat + "Km Away" + "\n" +
+        "Incident Date: " + incident.getIncident_date());
+        Marker marker = mMap.addMarker(markerOptions);
+        marker.setTag(incident);
     }
 
     private double distanceFormatting(double distanceFromHome) {
@@ -1198,13 +1210,13 @@ public class MainActivity extends AppCompatActivity
             double latitude = Double.parseDouble(latlong[0]);
             double longitude = Double.parseDouble(latlong[1]);
             LatLng inLoc = new LatLng( latitude, longitude);
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 18));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 19));
             noticeIntent.removeExtra(getString( R.string.notification_location));
         }
     }
 
     private Bitmap getBitmap(int drawableRes) {
-        Drawable drawable = getResources().getDrawable(drawableRes);
+        Drawable drawable = getDrawable(drawableRes);
         Canvas canvas = new Canvas();
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         canvas.setBitmap(bitmap);
@@ -1300,7 +1312,6 @@ public class MainActivity extends AppCompatActivity
         MobileAds.initialize( MainActivity.this, addMobAppId);
         mAdView = (AdView) findViewById( R.id.adView );
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice( AdRequest.DEVICE_ID_EMULATOR )
                 .build();
         mAdView.loadAd(adRequest);
     }

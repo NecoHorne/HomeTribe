@@ -43,12 +43,10 @@ public class HomeActivity extends AppCompatActivity {
     private Place homePlace;
 
     private Button saveButton;
-    private Spinner mProvinceSpinner;
     private PlaceAutocompleteFragment mAutocompleteFragment;
     private String[] mTowns;
     private int mProvinces_array;
     private ArrayAdapter<CharSequence> mProvinceAdapter;
-    private String mChosenProvince;
     private SharedPreferences mHomePrefs;
 
     public static boolean isActivityRunning;
@@ -79,30 +77,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void uiSetup() {
-        mProvinceSpinner = (Spinner) findViewById(R.id.home_province_spinner2);
-        provinceSpinnerSetup();
         saveButton = (Button) findViewById(R.id.home_save_button2);
         saveButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveHome();
-            }
-        } );
-    }
-
-    private void provinceSpinnerSetup() {
-        mProvinces_array = R.array.provinces_array;
-        mProvinceAdapter = ArrayAdapter.createFromResource( getApplicationContext(), mProvinces_array, R.layout.spinner_item_home );
-        mProvinceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mProvinceSpinner.setAdapter( mProvinceAdapter );
-        mProvinceSpinner.setOnItemSelectedListener( new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                mChosenProvince = mProvinceSpinner.getSelectedItem().toString();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
             }
         } );
     }
@@ -139,7 +118,7 @@ public class HomeActivity extends AppCompatActivity {
             Home home = new Home();
             home.setStreet_address( homePlace.getAddress().toString());
             home.setLocation(homePlace.getLatLng());
-            home.setState_province(mChosenProvince);
+//            home.setState_province(mChosenProvince);
 
             Geocoder geocoder = new Geocoder( getApplicationContext(), Locale.getDefault() );
             List<Address> addresses;
@@ -189,9 +168,9 @@ public class HomeActivity extends AppCompatActivity {
         String json = mHomePrefs.getString( Constants.HOME, "" );
         Home home = gson.fromJson(json, Home.class);
 
-        List<String> options = Arrays.asList( getResources().getStringArray( mProvinces_array ));
-        int provinceSelected = options.indexOf(home.getState_province());
-        mProvinceSpinner.setSelection(provinceSelected);
+//        List<String> options = Arrays.asList( getResources().getStringArray( mProvinces_array ));
+//        int provinceSelected = options.indexOf(home.getState_province());
+//        mProvinceSpinner.setSelection(provinceSelected);
         mAutocompleteFragment.setText(home.getStreet_address());
     }
 }

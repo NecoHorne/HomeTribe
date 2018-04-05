@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.necohorne.hometribe">
+    package="com.necohorne.hometribe"
+    android:versionCode="2"
+    android:versionName="1.01">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -132,7 +135,12 @@
             android:name=".Activities.AppActivities.AboutActivity"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Activities.AppActivities.HomeStatsActivity"></activity>
+        <activity android:name=".Activities.AppActivities.HomeStatsActivity" />
+        <activity
+            android:name=".Activities.AppActivities.EmailLoginActivity"
+            android:theme="@style/Theme.AppTheme.Light.NoActionBar" />
+        <activity android:name=".Activities.AppActivities.StatsFilterActivity" />
+        <activity android:name=".Activities.AppActivities.NoInternetActivity"></activity>
     </application>
 
 </manifest>

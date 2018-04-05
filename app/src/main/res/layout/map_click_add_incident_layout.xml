@@ -17,10 +17,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"/>
+        app:layout_constraintTop_toBottomOf="@+id/filter_title_2"/>
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/filter_title_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -50,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_add_incident_place" />
+        app:layout_constraintTop_toBottomOf="@+id/map_add_alert_time" />
 
     <EditText
         android:id="@+id/map_add_report_incident_cas_number"
@@ -77,22 +77,8 @@
         android:layout_marginTop="16dp"
         android:src="@drawable/ic_report_problem_black_24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView"
+        app:layout_constraintStart_toEndOf="@+id/filter_title_2"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/map_add_incident_place"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:textColor="@color/Black"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_add_incident_province_spinner" />
 
     <Button
         android:id="@+id/map_add_report_incident_submit_button"
@@ -110,18 +96,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map_add_report_incident_cas_number" />
-
-    <Spinner
-        android:id="@+id/map_add_incident_province_spinner"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_add_alert_time" />
 
     <TextView
         android:id="@+id/map_add_alert_time"

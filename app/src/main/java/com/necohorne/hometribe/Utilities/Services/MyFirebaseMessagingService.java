@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -49,22 +50,30 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        super.onMessageReceived( remoteMessage );
+        super.onMessageReceived(remoteMessage);
         String identifyDataType = remoteMessage.getData().get(getString(R.string.data_type));
 
-            // Check for new incidents
-            if (identifyDataType.equals(getString(R.string.data_type_incident))){
-                String title = remoteMessage.getData().get(getString(R.string.data_title));
-                String description = remoteMessage.getData().get(getString(R.string.data_description));
-                String reference = remoteMessage.getData().get(getString(R.string.data_reference));
-                getIncidentDistance( getApplicationContext(), reference, title, description);
-            }
+        // Check for new incidents
+        if (identifyDataType.equals(getString(R.string.data_type_incident))){
+            String title = remoteMessage.getData().get(getString(R.string.data_title));
+            String description = remoteMessage.getData().get(getString(R.string.data_description));
+            String reference = remoteMessage.getData().get(getString(R.string.data_reference));
+            getIncidentDistance( getApplicationContext(), reference, title, description);
+        }
 
-            //check for new neighbour requests.
-            if (identifyDataType.equalsIgnoreCase( getString( R.string.data_type_neighbour_request ) )){
-                String userId = remoteMessage.getData().get(getString(R.string.data_type_uid));
-                sendNotification(userId);
-            }
+        //check for new neighbour requests.
+        if (identifyDataType.equalsIgnoreCase( getString( R.string.data_type_neighbour_request ) )){
+            String userId = remoteMessage.getData().get(getString(R.string.data_type_uid));
+            sendNotification(userId);
+        }
+
+        //create notification for custom cloud message from firebase console
+        if (identifyDataType.equalsIgnoreCase( getString(R.string.data_type_cloud_message ) )){
+            String cloudMessage = remoteMessage.getData().get(getString(R.string.data_type_message));
+            Log.d( TAG, "cloud message: " + cloudMessage);
+            //todo
+        }
+
     }
 
     public void getIncidentDistance(final Context context, String reference, final String title, final String description) {
