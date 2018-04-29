@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--when adding to this list make the appropriate changes in:
+    MainActivity.java markerType,
+    HomeStatsActivity.java sortIncidentTypes,
+    -->
     <string-array name="incidents_array">
         <item>House Burglary</item>
         <item>House Robbery</item>
@@ -23,6 +27,7 @@
         <item>Kidnapping</item>
         <item>Assault</item>
         <item>Sexual Assault</item>
+        <item>Suspicious Activity</item>
         <item>other…</item>
     </string-array>
 </resources>

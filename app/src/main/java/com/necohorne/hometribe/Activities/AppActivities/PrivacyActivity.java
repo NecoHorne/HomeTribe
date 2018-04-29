@@ -74,4 +74,12 @@ public class PrivacyActivity extends AppCompatActivity {
         }
         super.onRestart();
     }
+
+    @Override
+    protected void onDestroy() {
+        if(mWebView != null){
+            mWebView.destroy();
+        }
+        super.onDestroy();
+    }
 }

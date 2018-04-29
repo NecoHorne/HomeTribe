@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.R;
+import com.necohorne.hometribe.Utilities.Notifications.CloudMessageNotification;
 import com.necohorne.hometribe.Utilities.Notifications.NeighbourRequestNotification;
 import com.necohorne.hometribe.Utilities.Notifications.NewIncidentNotification;
 
@@ -69,11 +70,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         //create notification for custom cloud message from firebase console
         if (identifyDataType.equalsIgnoreCase( getString(R.string.data_type_cloud_message ) )){
+            String fcmTitle = remoteMessage.getData().get(getString(R.string.data_type_fcm_title));
             String cloudMessage = remoteMessage.getData().get(getString(R.string.data_type_message));
-            Log.d( TAG, "cloud message: " + cloudMessage);
-            //todo
+            Log.d( TAG, "Cloud title: " + fcmTitle + "\n" + "cloud message: " + cloudMessage);
+            CloudMessageNotification.notify(getApplicationContext(),fcmTitle, cloudMessage,1);
         }
-
     }
 
     public void getIncidentDistance(final Context context, String reference, final String title, final String description) {

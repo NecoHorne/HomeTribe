@@ -54,7 +54,7 @@ public class SearchableActivity extends Activity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_searchable );
         Log.d(TAG, "onCreate: Activity started");
-        mContext = getApplicationContext();
+        mContext = this;
         initRecycler();
         getSearchIntent();
     }
@@ -86,9 +86,8 @@ public class SearchableActivity extends Activity {
                 if (dataSnapshot.exists()){
                     for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()) {
                         Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
-
-                        String username = objectMap.get( "user_name" ).toString();
                         try {
+                            String username = objectMap.get("user_name").toString();
                             String userEmail = objectMap.get("user_email").toString();
                             if (userEmail.equalsIgnoreCase( query )) {
                                 UserProfile userProfile = new UserProfile();
@@ -98,16 +97,16 @@ public class SearchableActivity extends Activity {
                                 userProfile.setUser_id( objectMap.get( "user_id" ).toString() );
                                 mUserProfiles.add( userProfile );
                             }
+                            if (username.equalsIgnoreCase( query )) {
+                                UserProfile userProfile = new UserProfile();
+                                userProfile.setUser_name( objectMap.get("user_name").toString());
+                                userProfile.setHome_location(getLocation(objectMap.get("home_location").toString()));
+                                userProfile.setProfile_image( objectMap.get("profile_image").toString() );
+                                userProfile.setUser_id( objectMap.get("user_id").toString() );
+                                mUserProfiles.add( userProfile );
+                            }
                         } catch (NullPointerException e) {
                             Log.d( TAG, "Null Pointer Exception: " + e );
-                        }
-                        if (username.equalsIgnoreCase( query )) {
-                            UserProfile userProfile = new UserProfile();
-                            userProfile.setUser_name( objectMap.get("user_name").toString());
-                            userProfile.setHome_location(getLocation(objectMap.get("home_location").toString()));
-                            userProfile.setProfile_image( objectMap.get("profile_image").toString() );
-                            userProfile.setUser_id( objectMap.get("user_id").toString() );
-                            mUserProfiles.add( userProfile );
                         }
                     }
                 }

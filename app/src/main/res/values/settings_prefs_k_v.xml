@@ -13,7 +13,7 @@
         <item>15</item>
     </string-array>
     <string-array name="pref_entries_time">
-        <item>Today</item>
+        <item>24 Hours</item>
         <item>Last week</item>
         <item>Last month</item>
         <item>Last 3 months</item>

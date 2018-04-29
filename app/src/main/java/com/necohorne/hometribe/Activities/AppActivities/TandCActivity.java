@@ -91,6 +91,14 @@ public class TandCActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    @Override
+    protected void onDestroy() {
+        if(mWebView != null){
+            mWebView.destroy();
+        }
+        super.onDestroy();
+    }
+
     public static String getStringFromAssets(String name, Context p_context)
     {
         try

@@ -2,6 +2,8 @@ package com.necohorne.hometribe.Activities.Dialog;
 
 import android.app.DialogFragment;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,8 +16,6 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.necohorne.hometribe.R;
-
-
 
 /**
  * Created by necoh on 2018/03/01.
@@ -63,6 +63,8 @@ public class DeleteIncidentDialog extends DialogFragment {
                 getDialog().dismiss();
             }
         } );
+
+        getDialog().getWindow().setBackgroundDrawable(new ColorDrawable( Color.TRANSPARENT));
 
         return mView;
     }

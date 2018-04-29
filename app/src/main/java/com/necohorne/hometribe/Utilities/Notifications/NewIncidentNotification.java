@@ -35,16 +35,16 @@ public class NewIncidentNotification {
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
-        String strRingtonePreference = preference.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
-        Uri sound = Uri.parse(strRingtonePreference);
+            String strRingtonePreference = preference.getString("notifications_new_message_ringtone", "content://settings/system/notification_sound");
+            Uri sound = Uri.parse(strRingtonePreference);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
             final NotificationCompat.Builder builder = new NotificationCompat.Builder( context )
 
                     .setDefaults( Notification.DEFAULT_LIGHTS)
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setDefaults(Notification.COLOR_DEFAULT)
-                    .setSmallIcon( R.drawable.ic_report_problem_black_24dp)
+                    .setSmallIcon(R.drawable.ic_report_problem_black_24dp)
                     .setContentTitle( title )
                     .setContentText( description )
                     .setPriority( NotificationCompat.PRIORITY_DEFAULT )

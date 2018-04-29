@@ -126,6 +126,7 @@ public class UserProfileActivity extends AppCompatActivity implements
         verifyStoragePermissions();
     }
 
+
     @Override
     protected void onStart() {
         isActivityRunning = true;
@@ -134,10 +135,13 @@ public class UserProfileActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.profile_menu, menu);
-        mEditButton = (MenuItem) menu.findItem( R.id.profile_editButton);
-        return true;
+        if (mProvider.equals("[password]")){
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.profile_menu, menu);
+            mEditButton = (MenuItem) menu.findItem( R.id.profile_editButton);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -337,7 +341,7 @@ public class UserProfileActivity extends AppCompatActivity implements
                 if (user != null){
                     UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
                             .setDisplayName(newDisplayName)
-                            .setPhotoUri(mSelectedImageUri)
+//                            .setPhotoUri(mSelectedImageUri)
                             .build();
                     user.updateProfile(profileUpdate).addOnCompleteListener( new OnCompleteListener<Void>() {
                         @Override
@@ -499,6 +503,7 @@ public class UserProfileActivity extends AppCompatActivity implements
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                             .child(getString(R.string.field_profile_image))
                             .setValue(firebaseURL.toString());
+                    updateImage(firebaseURL);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -521,6 +526,20 @@ public class UserProfileActivity extends AppCompatActivity implements
             Toast.makeText(this, "Image is too Large", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void updateImage(Uri firebaseURL) {
+        Log.d("FirebaseURL: ", firebaseURL.toString());
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        UserProfileChangeRequest profileUpdate = new UserProfileChangeRequest.Builder()
+                .setPhotoUri(firebaseURL)
+                .build();
+        user.updateProfile(profileUpdate).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+            }
+        });
     }
 
     private Bitmap getBitmap(int drawableRes) {

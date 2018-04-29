@@ -21,15 +21,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -42,6 +41,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +71,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -80,8 +79,10 @@ import com.necohorne.hometribe.Activities.Chat.ChatFragment;
 import com.necohorne.hometribe.Activities.Dialog.AddIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.CustomInfoWindow;
 import com.necohorne.hometribe.Activities.Dialog.DeleteIncidentDialog;
+import com.necohorne.hometribe.Activities.Dialog.EditIncidentDialog;
 import com.necohorne.hometribe.Activities.Dialog.HomePromptSetup;
 import com.necohorne.hometribe.Activities.Dialog.MapClickAddIncident;
+import com.necohorne.hometribe.Activities.Dialog.ReportIncidentDialog;
 import com.necohorne.hometribe.Constants.Constants;
 import com.necohorne.hometribe.Models.Home;
 import com.necohorne.hometribe.Models.IncidentCrime;
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity
     public static boolean isActivityRunning;
     private static final int REQUEST_INVITE = 0;
     private AdView mAdView;
+    private ProgressBar mProgressBar;
 
     //------------SHARED PREFS------------//
     private SharedPreferences mHomePrefs;
@@ -192,6 +194,9 @@ public class MainActivity extends AppCompatActivity
         setupDatabase();
         mLogOutIntent = new Intent( MainActivity.this, LoginActivity.class );
         displayMetrics();
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progressbar_main);
+        mProgressBar.setVisibility(View.GONE);
 
         addMobSetup();
     }
@@ -351,9 +356,14 @@ public class MainActivity extends AppCompatActivity
                 startActivity( homeIntent );
                 break;
             case R.id.nav_stats:
-                Intent statsIntent = new Intent( MainActivity.this, HomeStatsActivity.class );
-                startActivity( statsIntent );
-                break;
+                if(prefBool){
+                    Intent statsIntent = new Intent( MainActivity.this, HomeStatsActivity.class );
+                    startActivity( statsIntent );
+                    break;
+                } else {
+                    Toast.makeText(MainActivity.this, "Please set your home location before you can see the stats.", Toast.LENGTH_LONG).show();
+                    break;
+                }
             case R.id.nav_friends:
                 Intent neighbourIntent = new Intent( MainActivity.this, NeighboursActivity.class );
                 startActivity( neighbourIntent );
@@ -410,8 +420,7 @@ public class MainActivity extends AppCompatActivity
             if (provider.equals( "[password]" )) {
                 mName = user.getDisplayName();
                 DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
-                Query query = userRef.child( getString( R.string.dbnode_user ) ).child( user.getUid() );
-                Log.d( TAG, "Marker Query: " + query );
+                Query query = userRef.child( getString( R.string.dbnode_user ) ).child( user.getUid());
                 query.addListenerForSingleValueEvent( new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -424,13 +433,13 @@ public class MainActivity extends AppCompatActivity
                                         && !url.equals( "null" )) {
                                     mPhotoUrl = Uri.parse( url );
                                     Picasso.with( MainActivity.this )
-                                            .load( mPhotoUrl )
-                                            .into( profilePicture );
+                                            .load(mPhotoUrl)
+                                            .into(profilePicture);
                                     userName.setText( mName );
                                 } else {
                                     Bitmap bitmap = getBitmap( R.mipmap.ic_launcher_foreground_icon );
                                     profilePicture.setImageBitmap( bitmap );
-                                    userName.setText( mName );
+                                    userName.setText(mName);
                                 }
                             } catch (NullPointerException e) {
                                 Log.d( TAG, "no profile picture set " + e.toString() );
@@ -548,39 +557,43 @@ public class MainActivity extends AppCompatActivity
         };
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mDatabaseReference.addValueEventListener( postListener );
-
     }
 
     private void uploadUser() {
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        final String userId = user.getUid();
-        mUserProfile = createUser();
-        mDatabaseReference = FirebaseDatabase.getInstance()
-                .getReference()
-                .child( getString( R.string.dbnode_user ) )
-                .child( mUserProfile.getUser_id() );
-        Query query = mDatabaseReference.orderByChild( mUserProfile.getUser_id() );
-        query.addListenerForSingleValueEvent( new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    mDatabaseReference.setValue( mUserProfile );
-                } else {
-                    Log.d( TAG, "uploadUser, Key Exists, User not uploaded" );
-                    Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
-                    try {
-                        String uid = objectMap.get( "user_id" ).toString();
-                    } catch (NullPointerException e) {
-                        mDatabaseReference.setValue( mUserProfile );
-                    }
-                    checkAndLogFCMToken();
-                }
-            }
+        checkAuthenticationState();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+        if( user != null){
+            if(user.getUid() != null){
+                mUserProfile = createUser();
+                mDatabaseReference = FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child(getString( R.string.dbnode_user ) )
+                        .child( mUserProfile.getUser_id());
+                Query query = mDatabaseReference.orderByChild( mUserProfile.getUser_id() );
+                query.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if (!dataSnapshot.exists()) {
+                            mDatabaseReference.setValue(mUserProfile);
+                        } else {
+                            Log.d( TAG, "uploadUser, Key Exists, User not uploaded" );
+                            Map<String, Object> objectMap = (HashMap<String, Object>) dataSnapshot.getValue();
+                            if(objectMap.size() == 0 || !objectMap.containsKey("user_id")){
+                                if(mUserProfile != null){
+                                    mDatabaseReference.setValue(mUserProfile );
+                                }
+                            }
+                            checkAndLogFCMToken();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                } );
             }
-        } );
+        }
     }
 
     private void checkAuthenticationState() {
@@ -605,18 +618,22 @@ public class MainActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     // check if current key matches online key. if not write the new one
-                    if (!dataSnapshot.equals( token )) {
+                    if (!dataSnapshot.getValue().equals( token )) {
+                        if(user != null && token != null){
+                            userRef.child( getString( R.string.dbnode_user ) )
+                                    .child( user.getUid() )
+                                    .child( "fcm_token" )
+                                    .setValue( token );
+                        }
+                    }
+                } else {
+                    //token does not exist, write new one to user.
+                    if(user != null && token != null){
                         userRef.child( getString( R.string.dbnode_user ) )
                                 .child( user.getUid() )
                                 .child( "fcm_token" )
                                 .setValue( token );
                     }
-                } else {
-                    //token does not exist, write new one to user.
-                    userRef.child( getString( R.string.dbnode_user ) )
-                            .child( user.getUid() )
-                            .child( "fcm_token" )
-                            .setValue( token );
                 }
             }
 
@@ -815,7 +832,7 @@ public class MainActivity extends AppCompatActivity
         TextView policeCAS = view.findViewById(R.id.police_cas);
         TextView streetAddress = view.findViewById(R.id.pop_street_name);
         Button dissmissPop = view.findViewById(R.id.dismissPop);
-        ImageButton deleteButton = view.findViewById( R.id.pop_up_delete);
+        ImageButton optionsButton = view.findViewById( R.id.pop_up_options);
         final TextView reportedBy = view.findViewById(R.id.pop_reported_by);
 
         //get and init marker data from incident data.
@@ -856,7 +873,7 @@ public class MainActivity extends AppCompatActivity
             if (incident.getPolice_cas_number() != null){
                 policeCAS.setText(getString(R.string.police_cas) + incident.getPolice_cas_number());
             }
-            //get reported by uid, if it is the same as user idea, reported by you else check database and get reported by user details.
+            //get reported by uid, if it is the same as user id, reported by you else check database and get reported by user details.
             if (incident.getReported_by() != null){
                 final String uid = incident.getReported_by();
                 if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals( uid )){
@@ -868,17 +885,6 @@ public class MainActivity extends AppCompatActivity
                             startActivity( new Intent( MainActivity.this, UserProfileActivity.class));
                         }
                     } );
-                    // if the user was the reporter, delete button becomes visible and user will be able to delete incident
-                    if (uid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-                        deleteButton.setVisibility(View.VISIBLE);
-                        deleteButton.setOnClickListener( new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                deleteIncidentDialog(incident);
-                                alertDialog.dismiss();
-                            }
-                        } );
-                    }
                 }else {
                     DatabaseReference userRef = FirebaseDatabase.getInstance().getReference();
                     Query query = userRef.child(getString(R.string.dbnode_user)).child(uid);
@@ -912,6 +918,12 @@ public class MainActivity extends AppCompatActivity
                     } );
                 }
             }
+            optionsButton.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openPopOptions(incident, alertDialog);
+                }
+            } );
         }
         alertDialog.show();
         alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -922,6 +934,75 @@ public class MainActivity extends AppCompatActivity
                 alertDialog.dismiss();
             }
         } );
+    }
+
+    private void openPopOptions(final IncidentCrime incident, final AlertDialog alertDialog) {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder( MainActivity.this );
+        View view = getLayoutInflater().inflate(R.layout.pop_more_options, null);
+        dialogBuilder.setView(view);
+        final AlertDialog optionsDialog = dialogBuilder.create();
+
+        ConstraintLayout report = (ConstraintLayout) view.findViewById(R.id.pop_report_constraint);
+        ConstraintLayout delete = (ConstraintLayout) view.findViewById(R.id.pop_delete_constraint);
+        ConstraintLayout edit = (ConstraintLayout) view.findViewById(R.id.pop_edit_constraint);
+
+        report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                report(incident);
+                optionsDialog.dismiss();
+            }
+        });
+
+        if (incident.getReported_by() != null){
+            final String uid = incident.getReported_by();
+            if (FirebaseAuth.getInstance().getCurrentUser().getUid().equals( uid )){
+                // if the user was the reporter, delete button and edit button becomes visible and user will be able to delete incident
+                if (uid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                    delete.setVisibility(View.VISIBLE);
+                    delete.setOnClickListener( new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            deleteIncidentDialog(incident);
+                            optionsDialog.dismiss();
+                            alertDialog.dismiss();
+                        }
+                    } );
+
+                    edit.setVisibility(View.VISIBLE);
+                    edit.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            editIncident(incident);
+                            optionsDialog.dismiss();
+                            alertDialog.dismiss();
+                        }
+                    });
+
+                }
+            }
+        }
+        optionsDialog.show();
+        optionsDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
+
+    private void editIncident(IncidentCrime incident) {
+        String keyRef = incident.getReference();
+        EditIncidentDialog editIncidentDialog = new EditIncidentDialog();
+        Bundle args = new Bundle();
+        args.putString(getString(R.string.field_key_ref), keyRef);
+        editIncidentDialog.setArguments(args);
+        editIncidentDialog.show(getFragmentManager(), "edit_incident_dialog");
+    }
+
+    private void report(IncidentCrime incident) {
+        String keyRef = incident.getReference();
+        ReportIncidentDialog reportIncidentDialog = new ReportIncidentDialog();
+        Bundle args = new Bundle();
+        args.putString(getString(R.string.field_key_ref), keyRef);
+        reportIncidentDialog.setArguments(args);
+        reportIncidentDialog.show(getFragmentManager(), "dialog_report_incident");
     }
 
     private void deleteIncidentDialog(IncidentCrime incident) {
@@ -1011,10 +1092,8 @@ public class MainActivity extends AppCompatActivity
 
     //------------INCIDENTS TO FIREBASE DATABASE------------//
     public void getIncidentLocations(){
-        ArrayList<IncidentCrime> crimeArrayList = new ArrayList<>();
-        if (crimeArrayList.size() > 0){
-            crimeArrayList.clear();
-        }
+        //Main function to get the saved incidents from the database in the incidents node.
+
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         Query query = mDatabaseReference.child(getString(R.string.dbnode_incidents));
 
@@ -1023,43 +1102,71 @@ public class MainActivity extends AppCompatActivity
 
         if (prefBool){
             mMap.clear();
+            mProgressBar.setVisibility(View.VISIBLE);
             query.addListenerForSingleValueEvent( new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
                     for (DataSnapshot singleSnapshot: dataSnapshot.getChildren()){
+                        //init a new incident
                         IncidentCrime incident = new IncidentCrime();
+                        //use map to map put data from the snapshot
                         Map<String, Object> objectMap = (HashMap<String, Object>) singleSnapshot.getValue();
 
+                        //set the location and date so that they can be checked against user preferences
                         incident.setIncident_location(getLocation(objectMap.get(getString(R.string.field_incident_location)).toString()));
                         incident.setIncident_date(objectMap.get(getString( R.string.field_incident_date)).toString());
 
+                        //get the shared preferences
                         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                         int distanceFromHomePref = Integer.parseInt( pref.getString("prefs_distance_from_home", "5") );
-                        int incidentTimePref = Integer.parseInt( pref.getString("prefs_time_home", "31") );
+                        int incidentTimePref = Integer.parseInt( pref.getString("prefs_time_home", "31"));
+
+                        //get the distance that the incident occurred from user home
                         double distanceFromHome = checkDistance(incident);
                         today();
+
                         if (incident.getIncident_location() != null){
                             if (incident.getIncident_date() != null){
                                 long days = getDateDiff(convertDate(incident).getTime(), mToday, TimeUnit.DAYS);
+                                //check incident time vs user time prefs.
                                 if (days <= incidentTimePref){
+                                    //check incident distance against user distance prefs.
                                     if (distanceFromHome <= distanceFromHomePref){
                                         incident.setIncident_type(objectMap.get(getString(R.string.field_incident_type)).toString());
-                                        incident.setCountry(objectMap.get(getString(R.string.field_incident_type)).toString());
-                                        incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
-                                        incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
-                                        incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
-                                        incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
-                                        incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
-                                        incident.setReference(singleSnapshot.getKey());
-
-                                        setUpIncidentMarkers(incident);
+                                        //suspicious activity to be handled differently to incidents, only show on map for a few hours.
+                                        if(incident.getIncident_type().equals("Suspicious Activity")){
+                                            long suspiciousHours = getDateDiff(convertDate(incident).getTime(), mToday, TimeUnit.HOURS);
+                                            if(suspiciousHours < 8){
+                                                incident.setCountry(objectMap.get(getString(R.string.field_country)).toString());
+                                                incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
+                                                incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
+                                                incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
+                                                incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
+                                                incident.setReference(singleSnapshot.getKey());
+                                                if(objectMap.containsKey("town")){
+                                                    incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
+                                                }
+                                                setUpIncidentMarkers(incident);
+                                            }
+                                        } else {
+                                            incident.setCountry(objectMap.get(getString(R.string.field_country)).toString());
+                                            incident.setStreet_address(objectMap.get(getString(R.string.field_street_address)).toString());
+                                            incident.setIncident_description(objectMap.get(getString(R.string.field_incident_description)).toString());
+                                            incident.setPolice_cas_number(objectMap.get(getString(R.string.field_police_cas_number)).toString());
+                                            incident.setReported_by(objectMap.get(getString(R.string.field_reported_by)).toString());
+                                            incident.setReference(singleSnapshot.getKey());
+                                            if(objectMap.containsKey("town")){
+                                                incident.setTown(objectMap.get(getString(R.string.field_town)).toString());
+                                            }
+                                            setUpIncidentMarkers(incident);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                     homeLocation();
+                    mProgressBar.setVisibility(View.GONE);
                 }
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
@@ -1143,6 +1250,8 @@ public class MainActivity extends AppCompatActivity
         Bitmap resizeYellow = Bitmap.createScaledBitmap(yellowMarker, (int) mDefaultSize, (int) mDefaultSize, false);
         Bitmap dog = getBitmap( R.drawable.ic_siberian_husky );
         Bitmap resizeDog = Bitmap.createScaledBitmap(dog, (int) mDefaultSize, (int) mDefaultSize, false);
+        Bitmap suspicious = getBitmap( R.drawable.ic_002_burglar );
+        Bitmap resizeSuspicious = Bitmap.createScaledBitmap(suspicious, (int) mDefaultSize, (int) mDefaultSize, false);
 
 
         String type = incident.getIncident_type();
@@ -1192,6 +1301,8 @@ public class MainActivity extends AppCompatActivity
                 return resizeYellow;
             case "Sexual Assault":
                 return resizeRed;
+            case "Suspicious Activity":
+                return resizeSuspicious;
             case "other…":
                 return resizeYellow;
         }
@@ -1212,7 +1323,26 @@ public class MainActivity extends AppCompatActivity
             LatLng inLoc = new LatLng( latitude, longitude);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inLoc, 19));
             noticeIntent.removeExtra(getString( R.string.notification_location));
+        } else if(noticeIntent.hasExtra(getString(R.string.notification_fcm_title))){
+            String title = noticeIntent.getStringExtra(getString(R.string.notification_fcm_title));
+            String message = noticeIntent.getStringExtra(getString(R.string.notification_fcm_message));
+            cloudMessage(title, message);
         }
+    }
+
+    private void cloudMessage(String title, String message) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder( MainActivity.this );
+        View view = getLayoutInflater().inflate(R.layout.cloud_message_layout, null);
+        dialogBuilder.setView(view);
+        final AlertDialog fcmMessageDialog = dialogBuilder.create();
+
+        TextView titleCloud = (TextView) view.findViewById(R.id.fcm_title);
+        titleCloud.setText(title);
+        TextView messageCloud = (TextView) view.findViewById(R.id.fcm_message);
+        messageCloud.setText(message);
+
+        fcmMessageDialog.show();
+        fcmMessageDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
     }
 
     private Bitmap getBitmap(int drawableRes) {

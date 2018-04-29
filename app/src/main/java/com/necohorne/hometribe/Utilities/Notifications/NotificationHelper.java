@@ -29,8 +29,10 @@ public class NotificationHelper extends ContextWrapper{
     private NotificationManager mManager;
     public static final String INCIDENT_CHANNEL_ID = "com.necohorne.hometribe.STANDARD";
     public static final String NEIGHBOUR_CHANNEL_ID = "com.necohorne.hometribe.NEIGHBOUR";
+    public static final String CLOUD_CHANNEL_ID = "com.necohorne.hometribe.CLOUD";
     public static final String INCIDENT_CHANNEL_NAME = "INCIDENT CHANNEL";
     public static final String NEIGHBOUR_CHANNEL_NAME = "NEIGHBOUR CHANNEL";
+    public static final String CLOUD_CHANNEL_NAME = "CLOUD MESSAGE CHANNEL";
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public NotificationHelper(Context base) {
@@ -65,6 +67,15 @@ public class NotificationHelper extends ContextWrapper{
         neighbourChannel.setLightColor( Color.GREEN);
         neighbourChannel.setSound(sound, attributes);
         neighbourChannel.setLockscreenVisibility( Notification.VISIBILITY_PRIVATE);
+        getManager().createNotificationChannel(neighbourChannel);
+
+        NotificationChannel cloudChannel = new NotificationChannel(CLOUD_CHANNEL_ID,
+                CLOUD_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+        cloudChannel.enableLights(true);
+        cloudChannel.enableVibration(true);
+        cloudChannel.setLightColor( Color.GREEN);
+        cloudChannel.setSound(sound, attributes);
+        cloudChannel.setLockscreenVisibility( Notification.VISIBILITY_PRIVATE);
         getManager().createNotificationChannel(neighbourChannel);
 
     }
@@ -118,6 +129,26 @@ public class NotificationHelper extends ContextWrapper{
                 .setStyle( new Notification.BigTextStyle()
                         .bigText("you have a new Neighbour Request from " + username)
                         .setBigContentTitle("New Neighbour Request"))
+                .setAutoCancel(true);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public Notification.Builder getFCMChannelNotification(String title, String message) {
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.putExtra(getString(R.string.notification_fcm_title), title);
+        intent.putExtra(getString(R.string.notification_fcm_message), message);
+        return new Notification.Builder(getApplicationContext(), INCIDENT_CHANNEL_ID )
+                .setContentTitle(title)
+                .setContentText(message)
+                .setLargeIcon(BitmapFactory.decodeResource( getApplicationContext().getResources(), R.mipmap.ic_launcher_round))
+                .setContentIntent(
+                        PendingIntent.getActivity(
+                                getApplicationContext(),
+                                0,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT ) )
+                .setSmallIcon(R.drawable.ic_perm_device_information_black_24dp)
                 .setAutoCancel(true);
     }
 }

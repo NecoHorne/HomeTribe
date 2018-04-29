@@ -140,7 +140,7 @@
             android:name=".Activities.AppActivities.EmailLoginActivity"
             android:theme="@style/Theme.AppTheme.Light.NoActionBar" />
         <activity android:name=".Activities.AppActivities.StatsFilterActivity" />
-        <activity android:name=".Activities.AppActivities.NoInternetActivity"></activity>
+        <activity android:name=".Activities.AppActivities.NoInternetActivity" />
     </application>
 
 </manifest>

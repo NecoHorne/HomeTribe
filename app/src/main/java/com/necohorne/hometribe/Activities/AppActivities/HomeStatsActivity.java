@@ -87,7 +87,9 @@ public class HomeStatsActivity extends AppCompatActivity implements MyDialogClos
         }
 
         if(mDistancePrefs.equals(Constants.MY_TOWN)){
-            townName.setText(mHome.getTown_city());
+            if(!mHome.getTown_city().isEmpty()){
+                townName.setText(mHome.getTown_city());
+            }
         }else {
             townName.setText(mDistancePrefs + " Km from Home");
         }
@@ -263,8 +265,10 @@ public class HomeStatsActivity extends AppCompatActivity implements MyDialogClos
             if (addresses.size() > 0) {
                 if (addresses.get( 0 ).getSubLocality() != null) {
                     String town = addresses.get( 0 ).getSubLocality();
-                    if (mHome.getTown_city().equals(town)){
-                        return true;
+                    if(mHome.getTown_city() != null){
+                        if (mHome.getTown_city().equals(town)){
+                            return true;
+                        }
                     }
                 }
             }
@@ -299,6 +303,7 @@ public class HomeStatsActivity extends AppCompatActivity implements MyDialogClos
         float kidnapping = 0.0f;
         float assault = 0.0f;
         float sexualAssault = 0.0f;
+        float suspiciousActivity = 0.0f;
         float other = 0.0f;
 
         for (int i = 0; i < crimeArrayList.size(); i++ ){
@@ -369,6 +374,9 @@ public class HomeStatsActivity extends AppCompatActivity implements MyDialogClos
                     break;
                 case "Sexual Assault":
                     sexualAssault++;
+                    break;
+                case "Suspicious Activity":
+                    suspiciousActivity++;
                     break;
                 case "other…":
                     other++;
@@ -443,6 +451,9 @@ public class HomeStatsActivity extends AppCompatActivity implements MyDialogClos
 
         if (sexualAssault > 0)
         entries.add(new PieEntry(sexualAssault, "Sexual Assault"));
+
+//        if (suspiciousActivity > 0)
+//            entries.add(new PieEntry(suspiciousActivity, "Suspicious Activity"));
 
         if (other > 0)
         entries.add(new PieEntry(other, "other…"));

@@ -22,8 +22,8 @@ android {
         applicationId "com.necohorne.hometribe"
         minSdkVersion 22
         targetSdkVersion 26
-        versionCode 3
-        versionName "1.02"
+        versionCode 8
+        versionName "1.052"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
